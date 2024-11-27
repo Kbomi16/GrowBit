@@ -19,6 +19,7 @@ const config: Config = {
           40: '#1E4A19',
           50: '#1D392B',
         },
+        darkPrimary: '#181818',
       },
     },
   },

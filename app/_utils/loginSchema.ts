@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+export type LoginInput = z.infer<typeof loginSchema>
+
 export const loginSchema = z.object({
   id: z.string().min(1, '아이디는 필수입니다.'),
   password: z
