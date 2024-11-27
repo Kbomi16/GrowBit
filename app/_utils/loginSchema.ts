@@ -3,7 +3,10 @@ import { z } from 'zod'
 export type LoginInput = z.infer<typeof loginSchema>
 
 export const loginSchema = z.object({
-  id: z.string().min(1, '아이디는 필수입니다.'),
+  email: z
+    .string()
+    .email('유효한 이메일을 입력해주세요.')
+    .min(1, '이메일은 필수입니다.'),
   password: z
     .string()
     .min(8, '8자 이상 입력해주세요.')

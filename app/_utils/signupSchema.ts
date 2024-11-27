@@ -4,7 +4,10 @@ export type SignupInput = z.infer<typeof signupSchema>
 
 export const signupSchema = z
   .object({
-    id: z.string().min(1, '아이디는 필수입니다.'),
+    email: z
+      .string()
+      .email('유효한 이메일을 입력해주세요.')
+      .min(1, '이메일은 필수입니다.'),
     nickname: z
       .string()
       .max(10, '열 자 이하로 작성해주세요.')

@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 
 type FormData = {
-  id: string
+  email: string
   password: string
 }
 
@@ -40,12 +40,12 @@ export default function Login() {
           <input
             type="text"
             className="rounded-full border-2 border-green-30 bg-white px-4 py-2 outline-none"
-            placeholder="아이디"
-            {...register('id')}
+            placeholder="이메일"
+            {...register('email')}
           />
-          {errors.id && (
+          {errors.email && (
             <p className="pl-4 text-left text-sm text-red-500">
-              {errors.id.message}
+              {errors.email.message}
             </p>
           )}
 
