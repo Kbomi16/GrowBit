@@ -1,9 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
+import { auth, db } from '@/app/_utils/firebaseConfig'
 import { signupSchema } from '@/app/_utils/signupSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { createUserWithEmailAndPassword } from 'firebase/auth'
+import { doc, setDoc } from 'firebase/firestore'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 
 type FormData = {
@@ -23,9 +27,33 @@ export default function Signup() {
     mode: 'all',
   })
 
-  const onSubmit = (data: FormData) => {
+  const router = useRouter()
+
+  const onSubmit = async (data: FormData) => {
     const { confirmPassword, ...submitData } = data
-    console.log('회원가입 data:', submitData)
+    try {
+      const userInfo = await createUserWithEmailAndPassword(
+        auth,
+        submitData.email,
+        submitData.password,
+      )
+      const user = userInfo.user
+
+      // Firestore에 email, 닉네임 저장
+      await setDoc(doc(db, 'users', user.uid), {
+        email: submitData.email,
+        nickname: submitData.nickname,
+        createdAt: new Date(),
+      })
+      alert('회원가입 성공!')
+      router.push('/login')
+    } catch (error) {
+      if (error instanceof Error) {
+        alert(error.message)
+      } else {
+        alert('알 수 없는 오류가 발생했습니다.')
+      }
+    }
   }
 
   return (

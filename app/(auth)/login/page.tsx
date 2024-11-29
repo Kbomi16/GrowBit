@@ -1,8 +1,11 @@
 'use client'
+import { auth } from '@/app/_utils/firebaseConfig'
 import { loginSchema } from '@/app/_utils/loginSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { signInWithEmailAndPassword } from 'firebase/auth'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 
 type FormData = {
@@ -20,8 +23,20 @@ export default function Login() {
     mode: 'all',
   })
 
-  const onSubmit = (data: FormData) => {
-    console.log('로그인 data:', data)
+  const router = useRouter()
+
+  const onSubmit = async (data: FormData) => {
+    try {
+      await signInWithEmailAndPassword(auth, data.email, data.password)
+      alert('로그인 성공!')
+      router.push('/main')
+    } catch (error) {
+      if (error instanceof Error) {
+        alert(error.message)
+      } else {
+        alert('알 수 없는 오류가 발생했습니다.')
+      }
+    }
   }
 
   return (
