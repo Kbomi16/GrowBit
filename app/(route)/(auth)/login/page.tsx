@@ -8,6 +8,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
+import { setCookie } from 'cookies-next'
 
 type FormData = {
   email: string
@@ -28,7 +29,19 @@ export default function Login() {
 
   const onSubmit = async (data: FormData) => {
     try {
-      await signInWithEmailAndPassword(auth, data.email, data.password)
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        data.email,
+        data.password,
+      )
+      const token = await userCredential.user.getIdToken()
+
+      setCookie('token', token, {
+        maxAge: 60 * 60 * 24,
+        secure: true,
+        path: '/',
+      })
+
       alert('로그인 성공!')
       router.push('/main')
     } catch (error) {
