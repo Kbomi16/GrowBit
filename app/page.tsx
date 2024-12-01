@@ -37,8 +37,8 @@ export default function Home() {
         className="mt-8"
       >
         <Link href="/login">
-          <button className="hover:bg-green-70 bg-green-60 rounded-full px-6 py-3 text-lg font-semibold text-white transition">
-            Get Started
+          <button className="mt-4 rounded-full bg-green-30 px-6 py-2 text-2xl font-semibold text-white transition hover:bg-green-40">
+            시작하기{' '}
           </button>
         </Link>
       </motion.div>
