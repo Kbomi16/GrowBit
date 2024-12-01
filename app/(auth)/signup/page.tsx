@@ -3,6 +3,7 @@
 import { auth, db } from '@/app/_utils/firebaseConfig'
 import { signupSchema } from '@/app/_utils/signupSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { FirebaseError } from 'firebase/app'
 import { createUserWithEmailAndPassword } from 'firebase/auth'
 import { doc, setDoc } from 'firebase/firestore'
 import Image from 'next/image'
@@ -48,10 +49,16 @@ export default function Signup() {
       alert('회원가입 성공!')
       router.push('/login')
     } catch (error) {
-      if (error instanceof Error) {
-        alert(error.message)
+      if (error instanceof FirebaseError) {
+        switch (error.code) {
+          case 'auth/email-already-in-use':
+            alert('이미 사용 중인 이메일입니다.')
+            break
+          default:
+            alert('알 수 없는 오류가 발생했습니다. 다시 시도해주세요.')
+        }
       } else {
-        alert('알 수 없는 오류가 발생했습니다.')
+        alert('알 수 없는 오류가 발생했습니다. 다시 시도해주세요.')
       }
     }
   }

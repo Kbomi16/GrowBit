@@ -2,6 +2,7 @@
 import { auth } from '@/app/_utils/firebaseConfig'
 import { loginSchema } from '@/app/_utils/loginSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { FirebaseError } from 'firebase/app'
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -31,10 +32,21 @@ export default function Login() {
       alert('로그인 성공!')
       router.push('/main')
     } catch (error) {
-      if (error instanceof Error) {
-        alert(error.message)
+      console.error(error)
+      if (error instanceof FirebaseError) {
+        switch (error.code) {
+          case 'auth/user-not-found':
+            alert('사용자가 없습니다. 회원가입을 진행해 주세요.')
+            router.push('/signup')
+            break
+          case 'auth/wrong-password':
+            alert('비밀번호가 틀렸습니다.')
+            break
+          default:
+            alert('알 수 없는 오류가 발생했습니다. 다시 시도해주세요.')
+        }
       } else {
-        alert('알 수 없는 오류가 발생했습니다.')
+        alert('알 수 없는 오류가 발생했습니다. 다시 시도해주세요.')
       }
     }
   }
