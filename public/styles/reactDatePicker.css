@@ -1,0 +1,6 @@
+.react-datepicker {
+  width: 100% !important; /* 날짜 선택기 너비를 100%로 설정 */
+}
+.react-datepicker-wrapper {
+  width: 100%;
+}

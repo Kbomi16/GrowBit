@@ -1,6 +1,9 @@
 import { db } from '@/app/_utils/firebaseConfig'
 import { addDoc, collection } from 'firebase/firestore'
 import { ChangeEvent, useState } from 'react'
+import DatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
+import '@/public/styles/reactDatePicker.css'
 
 type HabitModalProps = {
   onClose: () => void
@@ -19,9 +22,11 @@ export default function AddHabitModal({
   onAddHabit,
 }: HabitModalProps) {
   const [habitName, setHabitName] = useState('')
-  const [startDate, setStartDate] = useState('')
-  const [endDate, setEndDate] = useState('')
+  const [startDate, setStartDate] = useState<Date | null>(null)
+  const [endDate, setEndDate] = useState<Date | null>(null)
   const [frequency, setFrequency] = useState<string[]>([])
+
+  const today = new Date()
 
   // 요일 선택
   const handleFrequencyChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -36,8 +41,8 @@ export default function AddHabitModal({
   const handleSubmit = async () => {
     const newHabit: Habit = {
       name: habitName,
-      startDate,
-      endDate,
+      startDate: startDate?.toISOString().split('T')[0] || '',
+      endDate: endDate?.toISOString().split('T')[0] || '',
       frequency,
     }
 
@@ -60,39 +65,41 @@ export default function AddHabitModal({
       <div
         className="mx-auto max-w-xl rounded-lg bg-white p-4 shadow-md"
         onClick={(e) => e.stopPropagation()}
-        // 버튼을 클릭할 경우
-        // 클릭 이벤트가 부모 요소인 모달 배경으로 전파되어 모달이 즉시 닫힐 수 있음 방지
       >
-        <h2 className="mb-6 text-2xl font-semibold">습관 설정</h2>
+        <h2 className="mb-6 text-2xl font-semibold">🔥루틴 등록하기</h2>
 
         <div className="mb-4">
-          <label className="mb-2 block text-sm">습관 이름</label>
+          <label className="mb-2 block text-sm">루틴 이름</label>
           <input
             type="text"
             value={habitName}
             onChange={(e) => setHabitName(e.target.value)}
-            placeholder="습관을 입력하세요"
-            className="w-full rounded-lg border border-gray-300 px-4 py-2"
+            placeholder="등록할 루틴명을 입력하세요"
+            className="w-full rounded-full border-2 border-gray-300 px-4 py-2 outline-none focus:border-green-40"
           />
         </div>
 
         <div className="mb-4">
-          <label className="mb-2 block text-sm">시작 날짜</label>
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-4 py-2"
+          <label className="mb-2 flex items-center text-sm">시작 날짜</label>
+          <DatePicker
+            selected={startDate}
+            onChange={(date) => setStartDate(date)}
+            minDate={today} // 오늘 날짜 이후로 설정
+            className="w-full cursor-pointer rounded-full border-2 border-gray-300 px-4 py-2 outline-none focus:border-green-40"
+            dateFormat="yyyy-MM-dd"
+            placeholderText="날짜를 선택해주세요"
           />
         </div>
 
         <div className="mb-4">
-          <label className="mb-2 block text-sm">종료 날짜</label>
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-4 py-2"
+          <label className="mb-2 flex items-center text-sm">종료 날짜</label>
+          <DatePicker
+            selected={endDate}
+            onChange={(date) => setEndDate(date)}
+            minDate={startDate || today} // 시작 날짜 이후로 설정
+            className="w-full cursor-pointer rounded-full border-2 border-gray-300 px-4 py-2 outline-none focus:border-green-40"
+            dateFormat="yyyy-MM-dd"
+            placeholderText="날짜를 선택해주세요"
           />
         </div>
 
@@ -100,15 +107,27 @@ export default function AddHabitModal({
           <label className="mb-2 block text-sm">매주 수행할 요일</label>
           <div className="flex gap-4">
             {['월', '화', '수', '목', '금', '토', '일'].map((day) => (
-              <label key={day} className="flex items-center">
+              <label key={day} className="flex cursor-pointer items-center">
                 <input
                   type="checkbox"
                   value={day}
                   checked={frequency.includes(day)}
                   onChange={handleFrequencyChange}
-                  className="mr-2"
+                  className="hidden"
                 />
-                {day}
+                <div
+                  className={`flex h-10 w-10 items-center justify-center rounded-full border-2 ${
+                    frequency.includes(day)
+                      ? 'border-green-20 bg-green-20'
+                      : 'border-gray-300'
+                  }`}
+                >
+                  <span
+                    className={`text-lg ${frequency.includes(day) ? 'text-white' : 'text-black'}`}
+                  >
+                    {day}
+                  </span>
+                </div>
               </label>
             ))}
           </div>
