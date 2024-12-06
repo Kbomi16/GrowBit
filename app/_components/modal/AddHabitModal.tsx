@@ -15,6 +15,7 @@ type Habit = {
   startDate: string
   endDate: string
   frequency: string[]
+  completedDates: string[]
 }
 
 export default function AddHabitModal({
@@ -44,6 +45,7 @@ export default function AddHabitModal({
       startDate: startDate?.toISOString().split('T')[0] || '',
       endDate: endDate?.toISOString().split('T')[0] || '',
       frequency,
+      completedDates: [],
     }
 
     try {
@@ -137,7 +139,7 @@ export default function AddHabitModal({
           className="w-full rounded-full bg-green-30 px-6 py-3 text-white shadow-lg transition hover:bg-green-40"
           onClick={handleSubmit}
         >
-          습관 추가
+          루틴 추가
         </button>
       </div>
     </div>
