@@ -4,9 +4,9 @@ import { db } from '@/app/_utils/firebaseConfig'
 import {
   collection,
   getDocs,
-  doc,
   updateDoc,
   arrayUnion,
+  doc,
 } from 'firebase/firestore'
 import { useState, useEffect } from 'react'
 import Calendar from 'react-calendar'
@@ -25,9 +25,7 @@ type Habit = {
 export default function Main() {
   const [habits, setHabits] = useState<Habit[]>([])
   const [showModal, setShowModal] = useState(false)
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
 
-  // Firestore에서 습관 불러오기
   const fetchHabits = async () => {
     const habitsCollection = collection(db, 'habits')
     const habitSnapshot = await getDocs(habitsCollection)
@@ -49,42 +47,49 @@ export default function Main() {
     fetchHabits()
   }, [])
 
-  // 완료 버튼 클릭 처리
-  const markAsCompleted = async (habitId: string, date: string) => {
-    const habitRef = doc(db, 'habits', habitId)
-    await updateDoc(habitRef, {
-      completedDates: arrayUnion(date),
-    })
-    fetchHabits()
+  const handleDateClick = async (habitId: string, date: Date) => {
+    const dateString = date.toISOString().split('T')[0] // YYYY-MM-DD 형식
+    const habit = habits.find((h) => h.id === habitId)
+
+    if (habit && !habit.completedDates.includes(dateString)) {
+      const confirmCompletion = window.confirm(
+        `${habit.name}을(를) 완료하시겠습니까?`,
+      )
+      if (confirmCompletion) {
+        const habitRef = doc(db, 'habits', habitId)
+        await updateDoc(habitRef, {
+          completedDates: arrayUnion(dateString),
+        })
+        fetchHabits()
+      }
+    }
   }
 
-  // 캘린더 타일 커스텀 스타일 적용
-  const tileContent = ({ date }: { date: Date }) => {
-    const formattedDate = date.toISOString().split('T')[0]
-
-    // 완료된 날짜 확인
-    const isCompleted = habits.some((habit) =>
-      habit.completedDates.includes(formattedDate),
-    )
-
-    // 비활성화 여부 확인
-    const isDisabled = habits.every(
-      (habit) => !habit.completedDates.includes(formattedDate),
+  // 주어진 날짜(date)가 특정 습관(habit)에 대해 클릭 가능한 날짜인지 확인
+  const isDateClickable = (habit: Habit, date: Date) => {
+    const dayOfWeek = date.getDay()
+    const frequencyDays = habit.frequency.map((day) =>
+      ['일', '월', '화', '수', '목', '금', '토'].indexOf(day),
     )
 
     return (
-      <div
-        className={`custom-tile ${isCompleted ? 'completed' : ''} ${isDisabled ? 'disabled' : ''}`}
-      >
-        {date.getDate()}
-      </div>
+      frequencyDays.includes(dayOfWeek) &&
+      date >= new Date(habit.startDate) &&
+      date <= new Date(habit.endDate)
     )
   }
 
-  // 선택된 날짜가 해당 습관의 수행 요일에 포함되는지 확인
-  const isDateValidForHabit = (habit: Habit, date: Date) => {
-    const dayOfWeek = date.toLocaleString('en-US', { weekday: 'short' }) // 요일 (예: "Mon", "Tue")
-    return habit.frequency.includes(dayOfWeek)
+  const isDateCompleted = (habit: Habit, date: Date) => {
+    const dateString = date.toISOString().split('T')[0]
+    return habit.completedDates.includes(dateString)
+  }
+
+  const isDateMissed = (habit: Habit, date: Date) => {
+    const today = new Date()
+    return (
+      date < today && // 오늘 이전 날짜
+      isDateClickable(habit, date) // 클릭 가능한 날짜인지 확인
+    )
   }
 
   return (
@@ -115,30 +120,27 @@ export default function Main() {
               {/* 날짜 선택 캘린더 */}
               <div className="mt-4">
                 <Calendar
-                  onChange={(value) => setSelectedDate(value as Date)}
-                  value={selectedDate}
-                  tileContent={tileContent}
-                  className="custom-calendar rounded-lg border-2 border-gray-300"
+                  tileClassName={({ date }) => {
+                    if (isDateCompleted(habit, date)) {
+                      return 'completed'
+                    } else if (isDateMissed(habit, date)) {
+                      return 'missed'
+                    } else if (isDateClickable(habit, date)) {
+                      return 'clickable'
+                    } else {
+                      return 'not-clickable'
+                    }
+                  }}
+                  onClickDay={(date) => {
+                    if (
+                      isDateClickable(habit, date) &&
+                      !isDateMissed(habit, date)
+                    ) {
+                      handleDateClick(habit.id, date)
+                    }
+                  }}
                 />
               </div>
-
-              {selectedDate &&
-                isDateValidForHabit(habit, selectedDate) &&
-                !habit.completedDates.includes(
-                  selectedDate.toISOString().split('T')[0],
-                ) && (
-                  <button
-                    onClick={() =>
-                      markAsCompleted(
-                        habit.id,
-                        selectedDate.toISOString().split('T')[0],
-                      )
-                    }
-                    className="mt-4 w-full rounded-full bg-green-500 px-6 py-3 text-white shadow-lg transition hover:bg-green-600"
-                  >
-                    완료
-                  </button>
-                )}
             </div>
           ))}
         </div>

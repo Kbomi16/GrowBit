@@ -51,10 +51,10 @@ export default function AddHabitModal({
     try {
       await addDoc(collection(db, 'habits'), newHabit)
       onAddHabit()
-      alert('습관 등록 완료!')
+      alert('루틴 등록 완료!')
       onClose()
     } catch (e) {
-      console.error('습관 추가 실패: ', e)
+      console.error('루틴 추가 실패: ', e)
       alert('오류가 발생했습니다. 다시 시도해주세요.')
     }
   }
