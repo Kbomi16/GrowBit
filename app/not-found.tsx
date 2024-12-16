@@ -1,18 +1,10 @@
-import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import notFoundAnimation from '@/public/animations/notFound.json'
-
-const Lottie = dynamic(() => import('react-lottie-player'), { ssr: false })
+import NotFoundAnimation from './_components/NotFoundAnimation'
 
 export default function NotFound() {
   return (
     <div className="mb-10 flex min-h-screen w-full max-w-full flex-col items-center justify-center overflow-hidden">
-      <Lottie
-        loop
-        animationData={notFoundAnimation}
-        play
-        style={{ width: 600, height: 400 }}
-      />
+      <NotFoundAnimation />
       <p className="text-lg text-gray-500">페이지를 찾을 수 없습니다.</p>
       <Link
         href="/main"
