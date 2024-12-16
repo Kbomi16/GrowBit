@@ -7,7 +7,7 @@ const Lottie = dynamic(() => import('react-lottie-player'), { ssr: false })
 
 export default function NotFound() {
   return (
-    <div className="mb-10 flex w-full max-w-full flex-col items-center justify-center overflow-hidden">
+    <div className="mb-10 flex min-h-screen w-full max-w-full flex-col items-center justify-center overflow-hidden">
       <Lottie
         loop
         animationData={notFoundAnimation}
