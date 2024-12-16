@@ -97,7 +97,7 @@ export default function Main() {
       <div className="p-4">
         <button
           onClick={() => setShowModal(true)}
-          className="w-full rounded-full bg-green-40 px-6 py-3 text-white shadow-lg transition hover:bg-green-600"
+          className="w-full rounded-full bg-green-30 px-6 py-3 text-white shadow-lg transition hover:bg-green-40"
         >
           루틴 추가
         </button>
