@@ -1,6 +1,6 @@
 .react-calendar {
   width: 100%;
-  max-width: 415px;
+  max-width: 400px;
   margin: auto;
   border-radius: 1rem;
   border: #f3f4f6 1px solid;
@@ -9,8 +9,9 @@
 }
 
 .react-calendar__tile {
-  width: 3rem;
-  height: 3rem;
+  aspect-ratio: 1;
+  width: 100%;
+  height: auto;
   display: flex;
   align-items: center;
   justify-content: center;
