@@ -7,11 +7,13 @@ import {
   updateDoc,
   arrayUnion,
   doc,
+  deleteDoc,
 } from 'firebase/firestore'
 import { useState, useEffect } from 'react'
 import Calendar from 'react-calendar'
 import 'react-calendar/dist/Calendar.css'
 import '@/public/styles/reactCalendar.css'
+import { FiTrash } from 'react-icons/fi'
 
 type Habit = {
   id: string
@@ -92,6 +94,15 @@ export default function Main() {
     )
   }
 
+  const handleDeleteHabit = async (habitId: string) => {
+    const confirmDelete = window.confirm('이 루틴을 삭제하시겠습니까?')
+    if (confirmDelete) {
+      const habitRef = doc(db, 'habits', habitId)
+      await deleteDoc(habitRef)
+      fetchHabits()
+    }
+  }
+
   return (
     <div className="mx-auto w-full max-w-[1200px]">
       <div className="p-4">
@@ -105,9 +116,18 @@ export default function Main() {
         <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
           {habits.map((habit) => (
             <div key={habit.id} className="rounded-lg bg-white p-6 shadow-md">
-              <h3 className="mb-2 text-xl font-semibold text-gray-800">
-                {habit.name}
-              </h3>
+              <div className="flex justify-between">
+                <h3 className="mb-2 text-xl font-semibold text-gray-800">
+                  {habit.name}
+                </h3>
+                <button
+                  onClick={() => handleDeleteHabit(habit.id)}
+                  className="text-red-500"
+                  aria-label="루틴 삭제 버튼"
+                >
+                  <FiTrash size={20} />
+                </button>
+              </div>
               <p className="text-gray-600">시작 날짜: {habit.startDate}</p>
               <p className="text-gray-600">종료 날짜: {habit.endDate}</p>
               <p className="mb-4 text-gray-600">
