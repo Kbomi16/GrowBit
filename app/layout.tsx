@@ -11,14 +11,15 @@ export default function RootLayout({
 }>) {
   const pathname = usePathname()
 
-  const hideHeaderPages = ['/', '/login', '/signup']
+  const hideHeaderPages = ['/', '/login', '/signup', '/not-found']
   const hideHeader = hideHeaderPages.includes(pathname)
 
   return (
     <html lang="ko">
       <body>
-        {!hideHeader && <Header />} {children}
-        <Footer />
+        {!hideHeader && <Header />}
+        {children}
+        {!hideHeader && <Footer />}
       </body>
     </html>
   )

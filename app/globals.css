@@ -19,4 +19,5 @@ body {
   text-decoration: none;
   background-color: #f7f2f2;
   font-family: 'AppleSDGothicNeoL', sans-serif;
+  overflow-x: hidden;
 }
