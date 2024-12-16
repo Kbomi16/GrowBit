@@ -1,22 +1,24 @@
-import type { Metadata } from 'next'
+'use client'
 import './globals.css'
-
-export const metadata: Metadata = {
-  title: 'GrowBit',
-  description: '조금씩(grow) 성장하는 습관(bit)',
-}
+import Header from './_components/Header'
+import Footer from './_components/Footer'
+import { usePathname } from 'next/navigation'
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const pathname = usePathname()
+
+  const hideHeaderPages = ['/', '/login', '/signup']
+  const hideHeader = hideHeaderPages.includes(pathname)
+
   return (
     <html lang="ko">
       <body>
-        <header></header>
-        {children}
-        <footer></footer>
+        {!hideHeader && <Header />} {children}
+        <Footer />
       </body>
     </html>
   )
