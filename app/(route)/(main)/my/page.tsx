@@ -134,9 +134,9 @@ export default function MyPage() {
               {isEditing ? (
                 <input
                   name="bio"
-                  value={tempUserData.bio}
+                  value={tempUserData.bio || ''}
                   onChange={handleChange}
-                  className="mt-2 w-full rounded border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-green-300"
+                  className="mt-2 w-full rounded border border-gray-300 p-2 focus:outline-none"
                   placeholder="자기소개를 입력하세요"
                 />
               ) : (
