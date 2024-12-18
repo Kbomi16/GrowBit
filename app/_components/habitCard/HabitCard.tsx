@@ -1,6 +1,7 @@
 import { Habit } from '@/types/habit'
 import Calendar from 'react-calendar'
 import { FiTrash } from 'react-icons/fi'
+import HabitCardChart from './HabitCardChart'
 
 type HabitCardProps = {
   habit: Habit
@@ -19,6 +20,38 @@ export default function HabitCard({
   isDateCompleted,
   isDateMissed,
 }: HabitCardProps) {
+  const startDate = new Date(habit.startDate)
+  const endDate = new Date(habit.endDate)
+
+  // frequency에 해당하는 요일을 계산
+  const frequencySet = new Set(habit.frequency.map((day) => day.toLowerCase())) // 요일을 소문자로 변환하여 Set 생성
+
+  // 총 수행 일수 계산 (frequency에 해당하는 요일만)
+  let totalDays = 0
+  for (
+    let date = new Date(startDate);
+    date <= endDate;
+    date.setDate(date.getDate() + 1)
+  ) {
+    const dayOfWeek = date
+      .toLocaleString('default', { weekday: 'short' })
+      .toLowerCase() // 요일을 소문자로 가져오기
+    if (frequencySet.has(dayOfWeek)) {
+      totalDays++
+    }
+  }
+
+  // 완료된 날짜 수 계산
+  const completedCount = habit.completedDates.length
+
+  // 달성률 계산
+  const achievementRate =
+    totalDays > 0 ? Math.floor((completedCount / totalDays) * 100) : 0
+
+  console.log('총 수행 일수:', totalDays)
+  console.log('완료된 날짜 수:', completedCount)
+  console.log('달성률:', achievementRate)
+
   return (
     <div className="rounded-lg bg-white p-6 shadow-md">
       <div className="flex justify-between">
@@ -33,15 +66,24 @@ export default function HabitCard({
           <FiTrash size={20} />
         </button>
       </div>
-      <p className="text-gray-600">시작 날짜: {habit.startDate}</p>
-      <p className="text-gray-600">종료 날짜: {habit.endDate}</p>
-      <p className="mb-4 text-gray-600">
-        매주 수행 요일: {habit.frequency.join(', ')}
-      </p>
-      <p className="font-semibold text-gray-800">
-        완료된 일수: {habit.completedDates.length}일
-      </p>
-
+      <div className="grid grid-cols-2">
+        <div className="flex flex-col gap-2">
+          <p className="text-gray-600">📆시작 날짜: {habit.startDate}</p>
+          <p className="text-gray-600">📆종료 날짜: {habit.endDate}</p>
+          <p className="text-gray-600">
+            🏃🏻‍➡️매주 수행 요일: {habit.frequency.join(', ')}
+          </p>
+          <p className="mt-4 text-lg font-semibold text-gray-800">
+            🔥달성률: {achievementRate}%
+          </p>
+        </div>
+        <div className="flex justify-center">
+          <HabitCardChart
+            completedCount={completedCount}
+            totalCount={totalDays}
+          />
+        </div>
+      </div>
       {/* 날짜 선택 캘린더 */}
       <div className="mt-4">
         <Calendar
