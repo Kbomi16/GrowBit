@@ -5,4 +5,5 @@ export type Habit = {
   endDate: string
   frequency: string[]
   completedDates: string[]
+  achievementRate?: number
 }

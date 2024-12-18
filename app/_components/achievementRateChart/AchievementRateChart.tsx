@@ -36,7 +36,7 @@ export default function AchievementRateChart({
     responsive: true,
     plugins: {
       legend: {
-        position: 'top' as const,
+        position: 'right' as const,
         labels: {
           usePointStyle: true,
           boxWidth: 5,
@@ -51,11 +51,11 @@ export default function AchievementRateChart({
   }
 
   return (
-    <div>
+    <div className="flex flex-col items-center rounded-3xl bg-white p-4 shadow-md">
       <h2 className="text-xl font-semibold">
         🎉 당신의 총 달성률은 {totalCompletionRate}%입니다! 잘하고 있어요! 🌟
       </h2>
-      <div className="size-56">
+      <div className="size-64">
         <Doughnut data={data} options={options} />
       </div>
     </div>

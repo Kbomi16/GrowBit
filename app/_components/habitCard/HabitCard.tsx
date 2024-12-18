@@ -53,7 +53,7 @@ export default function HabitCard({
   console.log('달성률:', achievementRate)
 
   return (
-    <div className="rounded-lg bg-white p-6 shadow-md">
+    <div className="rounded-3xl bg-white p-6 shadow-md">
       <div className="flex justify-between">
         <h3 className="mb-2 text-xl font-semibold text-gray-800">
           {habit.name}

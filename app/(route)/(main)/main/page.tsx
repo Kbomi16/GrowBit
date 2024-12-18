@@ -15,6 +15,7 @@ import '@/public/styles/reactCalendar.css'
 import HabitCard from '@/app/_components/habitCard/HabitCard'
 import { Habit } from '@/types/habit'
 import AchievementRateChart from '@/app/_components/achievementRateChart/AchievementRateChart'
+import LowestAchievementHabit from '@/app/_components/achievementRateChart/LowestAchievementHabit'
 
 export default function Main() {
   const [habits, setHabits] = useState<Habit[]>([])
@@ -97,10 +98,34 @@ export default function Main() {
     }
   }
 
+  // 제일 낮은 달성률 계산
+  const calculateAchievementRates = () => {
+    return habits.map((habit) => {
+      const totalDays = habit.frequency.length // 주어진 주기의 길이
+      const completedCount = habit.completedDates.length // 완료된 날짜 수
+      const achievementRate =
+        totalDays > 0 ? Math.floor((completedCount / totalDays) * 100) : 0
+      return { ...habit, achievementRate }
+    })
+  }
+
+  const habitWithRates = calculateAchievementRates()
+  const lowestHabit =
+    habitWithRates.length > 0
+      ? habitWithRates.reduce(
+          (prev, curr) =>
+            prev.achievementRate < curr.achievementRate ? prev : curr,
+          habitWithRates[0],
+        )
+      : null
+
   return (
     <div className="mx-auto w-full max-w-[1000px]">
-      <div className="rounded-md bg-white p-4">
-        <AchievementRateChart habits={habits} />
+      <div className="p-4">
+        <div className="grid w-full grid-cols-2 gap-4">
+          <AchievementRateChart habits={habits} />
+          <LowestAchievementHabit lowestHabit={lowestHabit} />
+        </div>
       </div>
       <div className="p-4">
         <button
