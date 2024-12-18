@@ -80,7 +80,7 @@ export default function HabitCard({
             🏃🏻‍➡️매주 수행 요일: <span className="block md:inline"></span>
             {habit.frequency.join(', ')}
           </p>
-          <p className="mt-4 text-sm font-semibold text-gray-800 md:text-base md:text-lg">
+          <p className="mt-4 text-sm font-semibold text-gray-800 md:text-lg">
             🔥달성률: {achievementRate}%
           </p>
         </div>

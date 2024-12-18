@@ -23,7 +23,7 @@ export default function AchievementRateChart({
     labels: ['완료', '미완료'],
     datasets: [
       {
-        label: '전체 달성률',
+        label: '달성률',
         data: [completedHabits, totalHabits - completedHabits],
         backgroundColor: ['#1E4A19', '#edecdf'],
         borderWidth: 1,
