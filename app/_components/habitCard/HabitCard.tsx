@@ -68,12 +68,19 @@ export default function HabitCard({
       </div>
       <div className="grid grid-cols-2">
         <div className="flex flex-col gap-2">
-          <p className="text-gray-600">📆시작 날짜: {habit.startDate}</p>
-          <p className="text-gray-600">📆종료 날짜: {habit.endDate}</p>
-          <p className="text-gray-600">
-            🏃🏻‍➡️매주 수행 요일: {habit.frequency.join(', ')}
+          <p className="text-sm text-gray-600 md:text-base">
+            📆시작 날짜: <span className="block md:inline"></span>
+            {habit.startDate}
           </p>
-          <p className="mt-4 text-lg font-semibold text-gray-800">
+          <p className="text-sm text-gray-600 md:text-base">
+            📆종료 날짜: <span className="block md:inline"></span>
+            {habit.endDate}
+          </p>
+          <p className="text-sm text-gray-600 md:text-base">
+            🏃🏻‍➡️매주 수행 요일: <span className="block md:inline"></span>
+            {habit.frequency.join(', ')}
+          </p>
+          <p className="mt-4 text-lg text-sm font-semibold text-gray-800 md:text-base">
             🔥달성률: {achievementRate}%
           </p>
         </div>

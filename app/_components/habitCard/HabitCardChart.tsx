@@ -44,7 +44,7 @@ export default function HabitCardChart({
   }
 
   return (
-    <div className="size-40">
+    <div className="size-24 md:size-40">
       <Doughnut data={data} options={options} />
     </div>
   )

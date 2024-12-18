@@ -20,7 +20,7 @@ export default function AchievementRateChart({
     totalHabits > 0 ? Math.floor((completedHabits / totalHabits) * 100) : 0
 
   const data = {
-    labels: ['완료된 습관', '미완료 습관'],
+    labels: ['완료', '미완료'],
     datasets: [
       {
         label: '전체 달성률',
@@ -34,6 +34,7 @@ export default function AchievementRateChart({
 
   const options = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: 'right' as const,
@@ -52,10 +53,10 @@ export default function AchievementRateChart({
 
   return (
     <div className="flex flex-col items-center rounded-3xl bg-white p-4 shadow-md">
-      <h2 className="text-xl font-semibold">
+      <h2 className="text-base font-semibold md:text-xl">
         🎉 당신의 총 달성률은 {totalCompletionRate}%입니다! 잘하고 있어요! 🌟
       </h2>
-      <div className="size-64">
+      <div className="size-32 md:size-64">
         <Doughnut data={data} options={options} />
       </div>
     </div>
