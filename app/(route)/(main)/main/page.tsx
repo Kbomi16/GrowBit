@@ -79,6 +79,8 @@ export default function Main() {
 
   const isDateMissed = (habit: Habit, date: Date) => {
     const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
     return (
       date < today && // 오늘 이전 날짜
       isDateClickable(habit, date) // 클릭 가능한 날짜인지 확인
