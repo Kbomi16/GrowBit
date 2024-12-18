@@ -99,7 +99,9 @@ export default function Main() {
 
   return (
     <div className="mx-auto w-full max-w-[1000px]">
-      <AchievementRateChart habits={habits} />
+      <div className="rounded-md bg-white p-4">
+        <AchievementRateChart habits={habits} />
+      </div>
       <div className="p-4">
         <button
           onClick={() => setShowModal(true)}
