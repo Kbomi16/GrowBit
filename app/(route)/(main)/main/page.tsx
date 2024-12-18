@@ -14,6 +14,7 @@ import 'react-calendar/dist/Calendar.css'
 import '@/public/styles/reactCalendar.css'
 import HabitCard from '@/app/_components/habitCard/HabitCard'
 import { Habit } from '@/types/habit'
+import AchievementRateChart from '@/app/_components/achievementRateChart/AchievementRateChart'
 
 export default function Main() {
   const [habits, setHabits] = useState<Habit[]>([])
@@ -97,7 +98,8 @@ export default function Main() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-[1200px]">
+    <div className="mx-auto w-full max-w-[1000px]">
+      <AchievementRateChart habits={habits} />
       <div className="p-4">
         <button
           onClick={() => setShowModal(true)}
