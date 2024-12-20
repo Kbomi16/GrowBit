@@ -127,6 +127,17 @@ export default function Main() {
         )
       : null
 
+  const filteredHabits = habits.filter((habit) => {
+    const completedCount = habit.completedDates.length
+    if (activeTab === 'completed') {
+      return completedCount > 0
+    }
+    if (activeTab === 'incomplete') {
+      return completedCount === 0
+    }
+    return true // 'all'일 경우, 모든 습관 표시
+  })
+
   return (
     <div className="mx-auto w-full max-w-[1000px]">
       <div className="p-4">
@@ -136,15 +147,17 @@ export default function Main() {
         </div>
       </div>
       <div className="p-4">
-        <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
-        <button
-          onClick={() => setShowModal(true)}
-          className="w-full rounded-full bg-green-30 px-6 py-3 text-white shadow-lg transition hover:bg-green-40"
-        >
-          루틴 추가
-        </button>
+        <div className="flex items-start justify-between">
+          <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
+          <button
+            onClick={() => setShowModal(true)}
+            className="rounded-full bg-green-30 px-6 py-3 text-white shadow-lg transition hover:bg-green-40"
+          >
+            루틴 추가
+          </button>
+        </div>
         <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
-          {habits.map((habit) => (
+          {filteredHabits.map((habit) => (
             <HabitCard
               key={habit.id}
               habit={habit}

@@ -8,21 +8,21 @@ export default function TabBar({ activeTab, onTabChange }: TabBarProps) {
     <div className="mb-4 flex justify-around border-b border-gray-300">
       <button
         onClick={() => onTabChange('all')}
-        className={`flex items-center px-4 py-2 ${activeTab === 'all' ? 'border-b-2 border-green-30 font-bold text-green-30' : 'text-gray-500'}`}
+        className={`flex items-center px-4 py-2 ${activeTab === 'all' ? 'border-b-2 border-green-30 font-semibold text-green-30' : 'text-gray-500'}`}
       >
         전체
       </button>
       <button
-        onClick={() => onTabChange('completed')}
-        className={`flex items-center px-4 py-2 ${activeTab === 'completed' ? 'border-b-2 border-green-30 font-bold text-green-30' : 'text-gray-500'}`}
+        onClick={() => onTabChange('incomplete')}
+        className={`flex items-center px-4 py-2 ${activeTab === 'incomplete' ? 'border-b-2 border-green-30 font-semibold text-green-30' : 'text-gray-500'}`}
       >
-        완료
+        진행중
       </button>
       <button
-        onClick={() => onTabChange('incomplete')}
-        className={`flex items-center px-4 py-2 ${activeTab === 'incomplete' ? 'border-b-2 border-green-30 font-bold text-green-30' : 'text-gray-500'}`}
+        onClick={() => onTabChange('completed')}
+        className={`flex items-center px-4 py-2 ${activeTab === 'completed' ? 'border-b-2 border-green-30 font-semibold text-green-30' : 'text-gray-500'}`}
       >
-        미완료
+        완료
       </button>
     </div>
   )

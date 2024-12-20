@@ -48,8 +48,14 @@ export default function HabitCard({
   // 달성률 계산
   const achievementRate = calculateAchievementRate(completedCount, totalDays)
 
+  // 완료 카드 스타일
+  const isCompleted = completedCount > 0
+
   return (
-    <div className="rounded-3xl bg-white p-6 shadow-md">
+    <div className="relative rounded-3xl bg-white p-6 shadow-md">
+      {isCompleted && (
+        <div className="absolute inset-0 flex items-center justify-center rounded-3xl bg-gray-800 bg-opacity-50"></div>
+      )}
       <div className="flex justify-between">
         <h3 className="mb-2 text-xl font-semibold text-gray-800">
           {habit.name}
