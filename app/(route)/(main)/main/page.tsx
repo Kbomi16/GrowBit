@@ -18,6 +18,7 @@ import AchievementRateChart from '@/app/_components/achievementRateChart/Achieve
 import LowestAchievementHabit from '@/app/_components/achievementRateChart/LowestAchievementHabit'
 import { calculateAchievementRate } from '@/app/_utils/calculateAchievementRate'
 import TabBar from '@/app/_components/TabBar/TabBar'
+import Pagination from '@/app/_components/Pagination/Pagination'
 
 export default function Main() {
   const [habits, setHabits] = useState<Habit[]>([])
@@ -26,6 +27,9 @@ export default function Main() {
   const [activeTab, setActiveTab] = useState<
     'all' | 'completed' | 'incomplete'
   >('incomplete')
+
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 4
 
   const fetchHabits = async () => {
     const habitsCollection = collection(db, 'habits')
@@ -167,6 +171,12 @@ export default function Main() {
     return true // 'all'일 경우, 모든 습관 표시
   })
 
+  const totalPages = Math.ceil(filteredHabits.length / itemsPerPage)
+  const displayedHabits = filteredHabits.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage,
+  )
+
   return (
     <div className="mx-auto w-full max-w-[1000px]">
       <div className="p-4">
@@ -186,7 +196,7 @@ export default function Main() {
           </button>
         </div>
         <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
-          {filteredHabits.map((habit) => (
+          {displayedHabits.map((habit) => (
             <HabitCard
               key={habit.id}
               habit={habit}
@@ -198,6 +208,11 @@ export default function Main() {
             />
           ))}
         </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
         {showModal && (
           <AddHabitModal
             onClose={() => setShowModal(false)}
