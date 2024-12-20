@@ -2,6 +2,7 @@ import { Habit } from '@/types/habit'
 import Calendar from 'react-calendar'
 import { FiTrash } from 'react-icons/fi'
 import HabitCardChart from './HabitCardChart'
+import { calculateAchievementRate } from '@/app/_utils/calculateAchievementRate'
 
 type HabitCardProps = {
   habit: Habit
@@ -45,12 +46,7 @@ export default function HabitCard({
   const completedCount = habit.completedDates.length
 
   // 달성률 계산
-  const achievementRate =
-    totalDays > 0 ? Math.floor((completedCount / totalDays) * 100) : 0
-
-  console.log('총 수행 일수:', totalDays)
-  console.log('완료된 날짜 수:', completedCount)
-  console.log('달성률:', achievementRate)
+  const achievementRate = calculateAchievementRate(completedCount, totalDays)
 
   return (
     <div className="rounded-3xl bg-white p-6 shadow-md">

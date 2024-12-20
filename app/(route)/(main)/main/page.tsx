@@ -16,6 +16,7 @@ import HabitCard from '@/app/_components/habitCard/HabitCard'
 import { Habit } from '@/types/habit'
 import AchievementRateChart from '@/app/_components/achievementRateChart/AchievementRateChart'
 import LowestAchievementHabit from '@/app/_components/achievementRateChart/LowestAchievementHabit'
+import { calculateAchievementRate } from '@/app/_utils/calculateAchievementRate'
 
 export default function Main() {
   const [habits, setHabits] = useState<Habit[]>([])
@@ -101,10 +102,12 @@ export default function Main() {
   // 제일 낮은 달성률 계산
   const calculateAchievementRates = () => {
     return habits.map((habit) => {
-      const totalDays = habit.frequency.length // 주어진 주기의 길이
-      const completedCount = habit.completedDates.length // 완료된 날짜 수
-      const achievementRate =
-        totalDays > 0 ? Math.floor((completedCount / totalDays) * 100) : 0
+      const totalDays = habit.frequency.length
+      const completedCount = habit.completedDates.length
+      const achievementRate = calculateAchievementRate(
+        completedCount,
+        totalDays,
+      )
       return { ...habit, achievementRate }
     })
   }
