@@ -2,7 +2,7 @@ import { Habit } from '@/types/habit'
 import Calendar from 'react-calendar'
 import { FiTrash } from 'react-icons/fi'
 import HabitCardChart from './HabitCardChart'
-import { calculateAchievementRate } from '@/app/_utils/calculateAchievementRate'
+import { calculateAchievementData } from '@/app/_utils/calculateAchievementData'
 
 type HabitCardProps = {
   habit: Habit
@@ -21,35 +21,27 @@ export default function HabitCard({
   isDateCompleted,
   isDateMissed,
 }: HabitCardProps) {
-  const startDate = new Date(habit.startDate)
+  const { totalDays, achievementRate } = calculateAchievementData(habit)
+
   const endDate = new Date(habit.endDate)
-
-  // frequency에 해당하는 요일을 계산
-  const frequencySet = new Set(habit.frequency.map((day) => day.toLowerCase())) // 요일을 소문자로 변환하여 Set 생성
-
-  // 총 수행 일수 계산 (frequency에 해당하는 요일만)
-  let totalDays = 0
-  for (
-    let date = new Date(startDate);
-    date <= endDate;
-    date.setDate(date.getDate() + 1)
-  ) {
-    const dayOfWeek = date
-      .toLocaleString('default', { weekday: 'short' })
-      .toLowerCase() // 요일을 소문자로 가져오기
-    if (frequencySet.has(dayOfWeek)) {
-      totalDays++
-    }
-  }
-
-  // 완료된 날짜 수 계산
-  const completedCount = habit.completedDates.length
-
-  // 달성률 계산
-  const achievementRate = calculateAchievementRate(completedCount, totalDays)
+  const isCompleted = achievementRate === 100 || endDate < new Date()
+  const isExpired = endDate < new Date()
 
   return (
-    <div className="rounded-3xl bg-white p-6 shadow-md">
+    <div className="relative rounded-3xl bg-white p-6 shadow-md">
+      {isCompleted && (
+        <div className="absolute inset-0 flex items-center justify-center rounded-3xl bg-gray-900 bg-opacity-50">
+          {isExpired ? (
+            <p className="font-semibold text-white md:text-3xl">
+              날짜가 지났어요 🥲
+            </p>
+          ) : (
+            <p className="font-semibold text-white md:text-3xl">
+              100% 달성했어요 😀
+            </p>
+          )}
+        </div>
+      )}
       <div className="flex justify-between">
         <h3 className="mb-2 text-xl font-semibold text-gray-800">
           {habit.name}
@@ -82,7 +74,7 @@ export default function HabitCard({
         </div>
         <div className="flex justify-center">
           <HabitCardChart
-            completedCount={completedCount}
+            completedCount={habit.completedDates.length}
             totalCount={totalDays}
           />
         </div>

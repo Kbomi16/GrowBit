@@ -16,11 +16,20 @@ import HabitCard from '@/app/_components/habitCard/HabitCard'
 import { Habit } from '@/types/habit'
 import AchievementRateChart from '@/app/_components/achievementRateChart/AchievementRateChart'
 import LowestAchievementHabit from '@/app/_components/achievementRateChart/LowestAchievementHabit'
-import { calculateAchievementRate } from '@/app/_utils/calculateAchievementRate'
+import TabBar from '@/app/_components/TabBar/TabBar'
+import Pagination from '@/app/_components/Pagination/Pagination'
+import { calculateAchievementData } from '@/app/_utils/calculateAchievementData'
 
 export default function Main() {
   const [habits, setHabits] = useState<Habit[]>([])
   const [showModal, setShowModal] = useState(false)
+
+  const [activeTab, setActiveTab] = useState<
+    'all' | 'completed' | 'incomplete'
+  >('incomplete')
+
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 4
 
   const fetchHabits = async () => {
     const habitsCollection = collection(db, 'habits')
@@ -102,12 +111,7 @@ export default function Main() {
   // 제일 낮은 달성률 계산
   const calculateAchievementRates = () => {
     return habits.map((habit) => {
-      const totalDays = habit.frequency.length
-      const completedCount = habit.completedDates.length
-      const achievementRate = calculateAchievementRate(
-        completedCount,
-        totalDays,
-      )
+      const { achievementRate } = calculateAchievementData(habit)
       return { ...habit, achievementRate }
     })
   }
@@ -122,6 +126,31 @@ export default function Main() {
         )
       : null
 
+  const handleTabChange = (tab: 'all' | 'completed' | 'incomplete') => {
+    setActiveTab(tab)
+    setCurrentPage(1) // 탭 변경 시 페이지를 1로 리셋
+  }
+
+  const filteredHabits = habits.filter((habit) => {
+    const { achievementRate } = calculateAchievementData(habit)
+
+    const isExpired = new Date(habit.endDate) < new Date()
+
+    if (activeTab === 'completed') {
+      return achievementRate === 100 || isExpired
+    }
+    if (activeTab === 'incomplete') {
+      return achievementRate < 100 && !isExpired
+    }
+    return true // 'all'일 경우, 모든 습관 표시
+  })
+
+  const totalPages = Math.ceil(filteredHabits.length / itemsPerPage)
+  const displayedHabits = filteredHabits.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage,
+  )
+
   return (
     <div className="mx-auto w-full max-w-[1000px]">
       <div className="p-4">
@@ -131,15 +160,17 @@ export default function Main() {
         </div>
       </div>
       <div className="p-4">
-        <button
-          onClick={() => setShowModal(true)}
-          className="w-full rounded-full bg-green-30 px-6 py-3 text-white shadow-lg transition hover:bg-green-40"
-        >
-          루틴 추가
-        </button>
-
+        <div className="flex items-start justify-between">
+          <TabBar activeTab={activeTab} onTabChange={handleTabChange} />
+          <button
+            onClick={() => setShowModal(true)}
+            className="rounded-full bg-green-30 px-6 py-3 text-white shadow-lg transition hover:bg-green-40"
+          >
+            루틴 추가
+          </button>
+        </div>
         <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
-          {habits.map((habit) => (
+          {displayedHabits.map((habit) => (
             <HabitCard
               key={habit.id}
               habit={habit}
@@ -151,7 +182,11 @@ export default function Main() {
             />
           ))}
         </div>
-
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
         {showModal && (
           <AddHabitModal
             onClose={() => setShowModal(false)}
