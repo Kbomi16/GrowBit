@@ -40,6 +40,20 @@ export default function AddHabitModal({
   }
 
   const handleSubmit = async () => {
+    if (!startDate || !endDate) {
+      alert('시작일과 종료일을 선택해주세요.')
+      return
+    }
+
+    const start = new Date(startDate)
+    const end = new Date(endDate)
+    const oneWeekInMillis = 7 * 24 * 60 * 60 * 1000 // 1주일의 밀리초
+
+    if (end.getTime() - start.getTime() < oneWeekInMillis) {
+      alert('루틴은 최소 1주일 이상 등록해야 합니다.')
+      return
+    }
+
     const newHabit: Habit = {
       name: habitName,
       startDate: startDate?.toISOString().split('T')[0] || '',
