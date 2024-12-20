@@ -126,6 +126,11 @@ export default function Main() {
         )
       : null
 
+  const handleTabChange = (tab: 'all' | 'completed' | 'incomplete') => {
+    setActiveTab(tab)
+    setCurrentPage(1) // 탭 변경 시 페이지를 1로 리셋
+  }
+
   const filteredHabits = habits.filter((habit) => {
     const { achievementRate } = calculateAchievementData(habit)
 
@@ -156,7 +161,7 @@ export default function Main() {
       </div>
       <div className="p-4">
         <div className="flex items-start justify-between">
-          <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
+          <TabBar activeTab={activeTab} onTabChange={handleTabChange} />
           <button
             onClick={() => setShowModal(true)}
             className="rounded-full bg-green-30 px-6 py-3 text-white shadow-lg transition hover:bg-green-40"
