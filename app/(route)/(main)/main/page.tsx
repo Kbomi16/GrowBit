@@ -17,10 +17,15 @@ import { Habit } from '@/types/habit'
 import AchievementRateChart from '@/app/_components/achievementRateChart/AchievementRateChart'
 import LowestAchievementHabit from '@/app/_components/achievementRateChart/LowestAchievementHabit'
 import { calculateAchievementRate } from '@/app/_utils/calculateAchievementRate'
+import TabBar from '@/app/_components/TabBar/TabBar'
 
 export default function Main() {
   const [habits, setHabits] = useState<Habit[]>([])
   const [showModal, setShowModal] = useState(false)
+
+  const [activeTab, setActiveTab] = useState<
+    'all' | 'completed' | 'incomplete'
+  >('incomplete')
 
   const fetchHabits = async () => {
     const habitsCollection = collection(db, 'habits')
@@ -131,13 +136,13 @@ export default function Main() {
         </div>
       </div>
       <div className="p-4">
+        <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
         <button
           onClick={() => setShowModal(true)}
           className="w-full rounded-full bg-green-30 px-6 py-3 text-white shadow-lg transition hover:bg-green-40"
         >
           루틴 추가
         </button>
-
         <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
           {habits.map((habit) => (
             <HabitCard
@@ -151,7 +156,6 @@ export default function Main() {
             />
           ))}
         </div>
-
         {showModal && (
           <AddHabitModal
             onClose={() => setShowModal(false)}
