@@ -48,13 +48,24 @@ export default function HabitCard({
   // 달성률 계산
   const achievementRate = calculateAchievementRate(completedCount, totalDays)
 
-  // 완료 카드 스타일
-  const isCompleted = completedCount > 0
+  // 완료 상태 확인
+  const isCompleted = achievementRate === 100 || endDate < new Date()
+  const isExpired = endDate < new Date() // 날짜가 지났는지 확인
 
   return (
     <div className="relative rounded-3xl bg-white p-6 shadow-md">
       {isCompleted && (
-        <div className="absolute inset-0 flex items-center justify-center rounded-3xl bg-gray-800 bg-opacity-50"></div>
+        <div className="absolute inset-0 flex items-center justify-center rounded-3xl bg-gray-900 bg-opacity-50">
+          {isExpired ? (
+            <p className="font-semibold text-white md:text-3xl">
+              날짜가 지났어요 🥲
+            </p>
+          ) : (
+            <p className="font-semibold text-white md:text-3xl">
+              100% 달성했어요 😀
+            </p>
+          )}
+        </div>
       )}
       <div className="flex justify-between">
         <h3 className="mb-2 text-xl font-semibold text-gray-800">

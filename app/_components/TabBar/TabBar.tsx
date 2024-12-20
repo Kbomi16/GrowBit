@@ -16,13 +16,13 @@ export default function TabBar({ activeTab, onTabChange }: TabBarProps) {
         onClick={() => onTabChange('incomplete')}
         className={`flex items-center px-4 py-2 ${activeTab === 'incomplete' ? 'border-b-2 border-green-30 font-semibold text-green-30' : 'text-gray-500'}`}
       >
-        진행중
+        진행 중
       </button>
       <button
         onClick={() => onTabChange('completed')}
         className={`flex items-center px-4 py-2 ${activeTab === 'completed' ? 'border-b-2 border-green-30 font-semibold text-green-30' : 'text-gray-500'}`}
       >
-        완료
+        진행 완료
       </button>
     </div>
   )
