@@ -10,19 +10,13 @@ import {
   deleteDoc,
 } from 'firebase/firestore'
 import { useState, useEffect } from 'react'
-import Calendar from 'react-calendar'
 import 'react-calendar/dist/Calendar.css'
 import '@/public/styles/reactCalendar.css'
-import { FiTrash } from 'react-icons/fi'
-
-type Habit = {
-  id: string
-  name: string
-  startDate: string
-  endDate: string
-  frequency: string[]
-  completedDates: string[]
-}
+import HabitCard from '@/app/_components/habitCard/HabitCard'
+import { Habit } from '@/types/habit'
+import AchievementRateChart from '@/app/_components/achievementRateChart/AchievementRateChart'
+import LowestAchievementHabit from '@/app/_components/achievementRateChart/LowestAchievementHabit'
+import { calculateAchievementRate } from '@/app/_utils/calculateAchievementRate'
 
 export default function Main() {
   const [habits, setHabits] = useState<Habit[]>([])
@@ -88,6 +82,8 @@ export default function Main() {
 
   const isDateMissed = (habit: Habit, date: Date) => {
     const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
     return (
       date < today && // 오늘 이전 날짜
       isDateClickable(habit, date) // 클릭 가능한 날짜인지 확인
@@ -103,8 +99,37 @@ export default function Main() {
     }
   }
 
+  // 제일 낮은 달성률 계산
+  const calculateAchievementRates = () => {
+    return habits.map((habit) => {
+      const totalDays = habit.frequency.length
+      const completedCount = habit.completedDates.length
+      const achievementRate = calculateAchievementRate(
+        completedCount,
+        totalDays,
+      )
+      return { ...habit, achievementRate }
+    })
+  }
+
+  const habitWithRates = calculateAchievementRates()
+  const lowestHabit =
+    habitWithRates.length > 0
+      ? habitWithRates.reduce(
+          (prev, curr) =>
+            prev.achievementRate < curr.achievementRate ? prev : curr,
+          habitWithRates[0],
+        )
+      : null
+
   return (
-    <div className="mx-auto w-full max-w-[1200px]">
+    <div className="mx-auto w-full max-w-[1000px]">
+      <div className="p-4">
+        <div className="grid w-full grid-cols-2 gap-4">
+          <AchievementRateChart habits={habits} />
+          <LowestAchievementHabit lowestHabit={lowestHabit} />
+        </div>
+      </div>
       <div className="p-4">
         <button
           onClick={() => setShowModal(true)}
@@ -115,53 +140,15 @@ export default function Main() {
 
         <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
           {habits.map((habit) => (
-            <div key={habit.id} className="rounded-lg bg-white p-6 shadow-md">
-              <div className="flex justify-between">
-                <h3 className="mb-2 text-xl font-semibold text-gray-800">
-                  {habit.name}
-                </h3>
-                <button
-                  onClick={() => handleDeleteHabit(habit.id)}
-                  className="text-red-500"
-                  aria-label="루틴 삭제 버튼"
-                >
-                  <FiTrash size={20} />
-                </button>
-              </div>
-              <p className="text-gray-600">시작 날짜: {habit.startDate}</p>
-              <p className="text-gray-600">종료 날짜: {habit.endDate}</p>
-              <p className="mb-4 text-gray-600">
-                매주 수행 요일: {habit.frequency.join(', ')}
-              </p>
-              <p className="font-semibold text-gray-800">
-                완료된 일수: {habit.completedDates.length}일
-              </p>
-
-              {/* 날짜 선택 캘린더 */}
-              <div className="mt-4">
-                <Calendar
-                  tileClassName={({ date }) => {
-                    if (isDateCompleted(habit, date)) {
-                      return 'completed'
-                    } else if (isDateMissed(habit, date)) {
-                      return 'missed'
-                    } else if (isDateClickable(habit, date)) {
-                      return 'clickable'
-                    } else {
-                      return 'not-clickable'
-                    }
-                  }}
-                  onClickDay={(date) => {
-                    if (
-                      isDateClickable(habit, date) &&
-                      !isDateMissed(habit, date)
-                    ) {
-                      handleDateClick(habit.id, date)
-                    }
-                  }}
-                />
-              </div>
-            </div>
+            <HabitCard
+              key={habit.id}
+              habit={habit}
+              onDelete={handleDeleteHabit}
+              onDateClick={handleDateClick}
+              isDateClickable={isDateClickable}
+              isDateCompleted={isDateCompleted}
+              isDateMissed={isDateMissed}
+            />
           ))}
         </div>
 
