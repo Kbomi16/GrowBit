@@ -16,9 +16,9 @@ import HabitCard from '@/app/_components/habitCard/HabitCard'
 import { Habit } from '@/types/habit'
 import AchievementRateChart from '@/app/_components/achievementRateChart/AchievementRateChart'
 import LowestAchievementHabit from '@/app/_components/achievementRateChart/LowestAchievementHabit'
-import { calculateAchievementRate } from '@/app/_utils/calculateAchievementRate'
 import TabBar from '@/app/_components/TabBar/TabBar'
 import Pagination from '@/app/_components/Pagination/Pagination'
+import { calculateAchievementData } from '@/app/_utils/calculateAchievementData'
 
 export default function Main() {
   const [habits, setHabits] = useState<Habit[]>([])
@@ -111,12 +111,7 @@ export default function Main() {
   // 제일 낮은 달성률 계산
   const calculateAchievementRates = () => {
     return habits.map((habit) => {
-      const totalDays = habit.frequency.length
-      const completedCount = habit.completedDates.length
-      const achievementRate = calculateAchievementRate(
-        completedCount,
-        totalDays,
-      )
+      const { achievementRate } = calculateAchievementData(habit)
       return { ...habit, achievementRate }
     })
   }
@@ -132,34 +127,8 @@ export default function Main() {
       : null
 
   const filteredHabits = habits.filter((habit) => {
-    const startDate = new Date(habit.startDate)
-    const endDate = new Date(habit.endDate)
+    const { achievementRate } = calculateAchievementData(habit)
 
-    // frequency에 해당하는 요일을 계산
-    const frequencySet = new Set(
-      habit.frequency.map((day) => day.toLowerCase()),
-    ) // 요일을 소문자로 변환하여 Set 생성
-
-    // 총 수행 일수 계산 (frequency에 해당하는 요일만)
-    let totalDays = 0
-    for (
-      let date = new Date(startDate);
-      date <= endDate;
-      date.setDate(date.getDate() + 1)
-    ) {
-      const dayOfWeek = date
-        .toLocaleString('default', { weekday: 'short' })
-        .toLowerCase() // 요일을 소문자로 가져오기
-      if (frequencySet.has(dayOfWeek)) {
-        totalDays++
-      }
-    }
-
-    // 완료된 날짜 수 계산
-    const completedCount = habit.completedDates.length
-
-    // 달성률 계산
-    const achievementRate = calculateAchievementRate(completedCount, totalDays)
     const isExpired = new Date(habit.endDate) < new Date()
 
     if (activeTab === 'completed') {
