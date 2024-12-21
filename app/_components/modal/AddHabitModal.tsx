@@ -1,9 +1,10 @@
-import { db } from '@/app/_utils/firebaseConfig'
+import { auth, db } from '@/app/_utils/firebaseConfig'
 import { addDoc, collection } from 'firebase/firestore'
-import { ChangeEvent, useState } from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import '@/public/styles/reactDatePicker.css'
+import { User } from 'firebase/auth'
 
 type HabitModalProps = {
   onClose: () => void
@@ -16,6 +17,7 @@ type Habit = {
   endDate: string
   frequency: string[]
   completedDates: string[]
+  userId: string
 }
 
 export default function AddHabitModal({
@@ -26,8 +28,13 @@ export default function AddHabitModal({
   const [startDate, setStartDate] = useState<Date | null>(null)
   const [endDate, setEndDate] = useState<Date | null>(null)
   const [frequency, setFrequency] = useState<string[]>([])
+  const [currentUser, setCurrentUser] = useState<User | null>(null)
 
   const today = new Date()
+
+  useEffect(() => {
+    setCurrentUser(auth.currentUser)
+  }, [])
 
   // 요일 선택
   const handleFrequencyChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -53,6 +60,10 @@ export default function AddHabitModal({
       alert('루틴은 최소 1주일 이상 등록해야 합니다.')
       return
     }
+    if (!currentUser) {
+      alert('로그인이 필요합니다.')
+      return
+    }
 
     const newHabit: Habit = {
       name: habitName,
@@ -60,6 +71,7 @@ export default function AddHabitModal({
       endDate: endDate?.toISOString().split('T')[0] || '',
       frequency,
       completedDates: [],
+      userId: currentUser.uid,
     }
 
     try {

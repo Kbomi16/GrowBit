@@ -51,6 +51,21 @@ export default function AchievementRateChart({
     },
   }
 
+  if (totalHabits === 0) {
+    return (
+      <div className="flex flex-col items-center rounded-3xl bg-white p-4 shadow-md">
+        <div className="text-center">
+          <h3 className="text-xl font-semibold text-green-40">
+            루틴이 없어요 🥲
+          </h3>
+          <p className="text-md mt-4 text-gray-700">
+            현재 루틴이 없습니다. 새로운 루틴을 추가해 보세요! ✨
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-col items-center rounded-3xl bg-white p-4 shadow-md">
       <h2 className="text-base font-semibold md:text-xl">

@@ -27,11 +27,11 @@ export default function LowestAchievementHabit({
         </div>
       ) : (
         <div className="text-center">
-          <h3 className="font-bold text-xl text-purple-600">
-            🌟 새로운 습관 추가
+          <h3 className="text-xl font-semibold text-green-40">
+            루틴이 없어요 🥲
           </h3>
           <p className="text-md mt-4 text-gray-700">
-            현재 습관이 없습니다. 새로운 습관을 추가해 보세요! ✨
+            현재 루틴이 없습니다. 새로운 루틴을 추가해 보세요! ✨
           </p>
         </div>
       )}
