@@ -17,6 +17,7 @@ import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import UserTabBar from '@/app/_components/TabBar/UserTabBar'
 import AddFriendModal from '@/app/_components/modal/AddFriendModal'
+import FriendList from '@/app/_components/FriendList/FriendList'
 
 type UserData = {
   email: string
@@ -24,6 +25,7 @@ type UserData = {
   profileImage: string
   nickname: string
   friends?: string[]
+  friendsDetails?: { id: string; nickname: string }[]
 }
 
 export default function MyPage() {
@@ -68,7 +70,32 @@ export default function MyPage() {
       const data = docSnap.data() as UserData
       setUserData(data)
       setTempUserData(data)
+
+      if (data.friends && data.friends.length > 0) {
+        const friendsDetails = await fetchFriendsDetails(data.friends)
+        setUserData((prevData) => ({
+          ...prevData,
+          friendsDetails,
+        }))
+      }
     }
+  }
+
+  // 친구들의 닉네임을 가져오는 함수
+  const fetchFriendsDetails = async (friendIds: string[]) => {
+    const friendsDetails: { id: string; nickname: string }[] = []
+
+    for (const friendId of friendIds) {
+      const friendDocRef = doc(db, 'users', friendId)
+      const friendDocSnap = await getDoc(friendDocRef)
+
+      if (friendDocSnap.exists()) {
+        const friendData = friendDocSnap.data()
+        friendsDetails.push({ id: friendId, nickname: friendData.nickname })
+      }
+    }
+
+    return friendsDetails
   }
 
   // 사용자 정보 업데이트
@@ -140,6 +167,9 @@ export default function MyPage() {
         ...prev,
         friends: updatedFriends,
       }))
+      alert(
+        `🎉 친구 추가에 성공했습니다! "${friendNickname}"님과 친구가 되었어요!`,
+      )
       setShowModal(false)
       setFriendNickname('')
       setFriendError('')
@@ -154,7 +184,6 @@ export default function MyPage() {
       <div className="flex flex-col rounded-3xl bg-white p-6 shadow-md">
         <UserTabBar activeTab={activeTab} setActiveTab={setActiveTab} />
 
-        {/* 프로필 정보 */}
         <AnimatePresence mode="wait">
           {activeTab === 'profile' && (
             <motion.div
@@ -258,7 +287,7 @@ export default function MyPage() {
                   친구 추가
                 </button>
               </div>
-              <p className="text-gray-600">아직 친구가 없습니다.</p>
+              <FriendList friends={userData.friendsDetails || []} />
             </motion.div>
           )}
         </AnimatePresence>
