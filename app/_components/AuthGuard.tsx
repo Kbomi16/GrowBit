@@ -32,7 +32,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   }, [router])
 
   if (!isLogin) {
-    return <div>로딩 중...</div>
+    return null
   }
 
   return <div>{children}</div>
