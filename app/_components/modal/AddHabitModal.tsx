@@ -79,7 +79,7 @@ export default function AddHabitModal({
       onClick={onClose}
     >
       <div
-        className="mx-auto max-w-xl rounded-lg bg-white p-4 shadow-md"
+        className="mx-auto max-w-xs rounded-lg bg-white p-4 shadow-md md:max-w-xl"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="mb-6 text-2xl font-semibold">🔥루틴 등록하기</h2>
@@ -121,7 +121,7 @@ export default function AddHabitModal({
 
         <div className="mb-4">
           <label className="mb-2 block text-sm">매주 수행할 요일</label>
-          <div className="flex gap-4">
+          <div className="flex flex-wrap gap-4">
             {['월', '화', '수', '목', '금', '토', '일'].map((day) => (
               <label key={day} className="flex cursor-pointer items-center">
                 <input
@@ -132,14 +132,14 @@ export default function AddHabitModal({
                   className="hidden"
                 />
                 <div
-                  className={`flex h-10 w-10 items-center justify-center rounded-full border-2 ${
+                  className={`flex h-6 w-6 items-center justify-center rounded-full border-2 md:h-10 md:w-10 ${
                     frequency.includes(day)
                       ? 'border-green-20 bg-green-20'
                       : 'border-gray-300'
                   }`}
                 >
                   <span
-                    className={`text-lg ${frequency.includes(day) ? 'text-white' : 'text-black'}`}
+                    className={`text-sm md:text-lg ${frequency.includes(day) ? 'text-white' : 'text-black'}`}
                   >
                     {day}
                   </span>
