@@ -25,7 +25,7 @@ type UserData = {
   profileImage: string
   nickname: string
   friends?: string[]
-  friendsDetails?: { id: string; nickname: string }[]
+  friendsDetails?: { id: string; nickname: string; bio: string }[]
 }
 
 export default function MyPage() {
@@ -83,7 +83,7 @@ export default function MyPage() {
 
   // 친구들의 닉네임을 가져오는 함수
   const fetchFriendsDetails = async (friendIds: string[]) => {
-    const friendsDetails: { id: string; nickname: string }[] = []
+    const friendsDetails: { id: string; nickname: string; bio: string }[] = []
 
     for (const friendId of friendIds) {
       const friendDocRef = doc(db, 'users', friendId)
@@ -91,7 +91,11 @@ export default function MyPage() {
 
       if (friendDocSnap.exists()) {
         const friendData = friendDocSnap.data()
-        friendsDetails.push({ id: friendId, nickname: friendData.nickname })
+        friendsDetails.push({
+          id: friendId,
+          nickname: friendData.nickname,
+          bio: friendData.bio,
+        })
       }
     }
 
@@ -279,7 +283,7 @@ export default function MyPage() {
               transition={{ duration: 0.3 }}
             >
               <div className="flex items-start justify-between">
-                <h2 className="text-lg font-semibold">친구 목록</h2>
+                <h2 className="mb-4 text-2xl font-semibold">친구 목록</h2>
                 <button
                   onClick={() => setShowModal(true)}
                   className="rounded-full bg-green-30 px-6 py-3 text-white shadow-lg transition hover:bg-green-40"
