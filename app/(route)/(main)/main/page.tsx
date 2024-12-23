@@ -1,6 +1,6 @@
 'use client'
 import AddHabitModal from '@/app/_components/modal/AddHabitModal'
-import { db } from '@/app/_utils/firebaseConfig'
+import { auth, db } from '@/app/_utils/firebaseConfig'
 import {
   collection,
   getDocs,
@@ -32,20 +32,26 @@ export default function Main() {
   const itemsPerPage = 4
 
   const fetchHabits = async () => {
+    const currentUserId = auth.currentUser?.uid // 현재 로그인한 유저의 ID 가져오기
+    if (!currentUserId) return // 유저가 없으면 아무것도 하지 않음
+
     const habitsCollection = collection(db, 'habits')
     const habitSnapshot = await getDocs(habitsCollection)
-    const habitList = habitSnapshot.docs.map((doc) => {
-      const habitData = doc.data()
-      return {
-        id: doc.id,
-        name: habitData.name,
-        startDate: habitData.startDate,
-        endDate: habitData.endDate,
-        frequency: habitData.frequency,
-        completedDates: habitData.completedDates || [],
-      }
-    })
-    setHabits(habitList)
+    const habitList = habitSnapshot.docs
+      .map((doc) => {
+        const habitData = doc.data()
+        return {
+          id: doc.id,
+          name: habitData.name,
+          startDate: habitData.startDate,
+          endDate: habitData.endDate,
+          frequency: habitData.frequency,
+          completedDates: habitData.completedDates || [],
+          userId: habitData.userId,
+        }
+      })
+      .filter((habit) => habit.userId === currentUserId) // 유저 ID 필터링
+    setHabits(habitList) // 해당 유저의 루틴만 설정
   }
 
   useEffect(() => {
@@ -169,18 +175,27 @@ export default function Main() {
             루틴 추가
           </button>
         </div>
-        <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
-          {displayedHabits.map((habit) => (
-            <HabitCard
-              key={habit.id}
-              habit={habit}
-              onDelete={handleDeleteHabit}
-              onDateClick={handleDateClick}
-              isDateClickable={isDateClickable}
-              isDateCompleted={isDateCompleted}
-              isDateMissed={isDateMissed}
-            />
-          ))}
+        <div className="mt-6">
+          {habits.length === 0 ? (
+            <div className="h-screen text-center text-gray-500">
+              <p>현재 루틴이 없습니다.</p>
+              <p>새로운 루틴을 추가해보세요!</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              {displayedHabits.map((habit) => (
+                <HabitCard
+                  key={habit.id}
+                  habit={habit}
+                  onDelete={handleDeleteHabit}
+                  onDateClick={handleDateClick}
+                  isDateClickable={isDateClickable}
+                  isDateCompleted={isDateCompleted}
+                  isDateMissed={isDateMissed}
+                />
+              ))}
+            </div>
+          )}
         </div>
         <Pagination
           currentPage={currentPage}

@@ -1,9 +1,10 @@
-import { db } from '@/app/_utils/firebaseConfig'
+import { auth, db } from '@/app/_utils/firebaseConfig'
 import { addDoc, collection } from 'firebase/firestore'
-import { ChangeEvent, useState } from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import '@/public/styles/reactDatePicker.css'
+import { User } from 'firebase/auth'
 
 type HabitModalProps = {
   onClose: () => void
@@ -16,6 +17,7 @@ type Habit = {
   endDate: string
   frequency: string[]
   completedDates: string[]
+  userId: string
 }
 
 export default function AddHabitModal({
@@ -26,8 +28,13 @@ export default function AddHabitModal({
   const [startDate, setStartDate] = useState<Date | null>(null)
   const [endDate, setEndDate] = useState<Date | null>(null)
   const [frequency, setFrequency] = useState<string[]>([])
+  const [currentUser, setCurrentUser] = useState<User | null>(null)
 
   const today = new Date()
+
+  useEffect(() => {
+    setCurrentUser(auth.currentUser)
+  }, [])
 
   // 요일 선택
   const handleFrequencyChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -53,6 +60,10 @@ export default function AddHabitModal({
       alert('루틴은 최소 1주일 이상 등록해야 합니다.')
       return
     }
+    if (!currentUser) {
+      alert('로그인이 필요합니다.')
+      return
+    }
 
     const newHabit: Habit = {
       name: habitName,
@@ -60,6 +71,7 @@ export default function AddHabitModal({
       endDate: endDate?.toISOString().split('T')[0] || '',
       frequency,
       completedDates: [],
+      userId: currentUser.uid,
     }
 
     try {
@@ -79,7 +91,7 @@ export default function AddHabitModal({
       onClick={onClose}
     >
       <div
-        className="mx-auto max-w-xl rounded-lg bg-white p-4 shadow-md"
+        className="mx-auto max-w-xs rounded-lg bg-white p-4 shadow-md md:max-w-xl"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="mb-6 text-2xl font-semibold">🔥루틴 등록하기</h2>
@@ -121,7 +133,7 @@ export default function AddHabitModal({
 
         <div className="mb-4">
           <label className="mb-2 block text-sm">매주 수행할 요일</label>
-          <div className="flex gap-4">
+          <div className="flex flex-wrap gap-4">
             {['월', '화', '수', '목', '금', '토', '일'].map((day) => (
               <label key={day} className="flex cursor-pointer items-center">
                 <input
@@ -132,14 +144,14 @@ export default function AddHabitModal({
                   className="hidden"
                 />
                 <div
-                  className={`flex h-10 w-10 items-center justify-center rounded-full border-2 ${
+                  className={`flex h-6 w-6 items-center justify-center rounded-full border-2 md:h-10 md:w-10 ${
                     frequency.includes(day)
                       ? 'border-green-20 bg-green-20'
                       : 'border-gray-300'
                   }`}
                 >
                   <span
-                    className={`text-lg ${frequency.includes(day) ? 'text-white' : 'text-black'}`}
+                    className={`text-sm md:text-lg ${frequency.includes(day) ? 'text-white' : 'text-black'}`}
                   >
                     {day}
                   </span>
