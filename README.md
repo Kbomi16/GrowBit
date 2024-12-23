@@ -2,7 +2,7 @@
 
 루틴 성장 관리 애플리케이션
 
-![alt text](image.png)
+![alt text](./public/imgs/image.png)
 
 ## 📍개발 기간
 
