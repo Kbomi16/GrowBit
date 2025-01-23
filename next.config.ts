@@ -1,7 +1,11 @@
-import type { NextConfig } from "next";
+/* eslint-disable @typescript-eslint/no-require-imports */
+const withPWA = require('next-pwa')({
+  dest: 'public',
+})
 
-const nextConfig: NextConfig = {
-  /* config options here */
-};
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  // next.js config
+}
 
-export default nextConfig;
+module.exports = withPWA(nextConfig)
