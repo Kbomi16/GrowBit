@@ -12,6 +12,7 @@ import Friends from '@/app/_components/Friends/Friends'
 export default function MyPage() {
   const [user, setUser] = useState<User | null>(null)
   const [userData, setUserData] = useState<UserData>({
+    id: '',
     email: '',
     bio: '',
     profileImage: '',

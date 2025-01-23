@@ -61,13 +61,6 @@ export default function Friends({ userData, setUserData }: FriendsProps) {
     setShowModal(false)
   }
 
-  // 친구 삭제
-  const handleDeleteFriend = (friendId: string) => {
-    setFriends((prevFriends) =>
-      prevFriends.filter((friend) => friend.id !== friendId),
-    )
-  }
-
   // 친구 추가 후 호출할 함수
   const handleAddFriend = (newFriend: {
     id: string
@@ -96,7 +89,7 @@ export default function Friends({ userData, setUserData }: FriendsProps) {
       ) : friends.length === 0 ? (
         <p>친구가 없습니다.</p>
       ) : (
-        <FriendList friends={friends} onDeleteFriend={handleDeleteFriend} />
+        <FriendList friends={friends} />
       )}
 
       {showModal && (
