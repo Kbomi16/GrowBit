@@ -21,5 +21,6 @@
   "lang": "en-KO",
   "name": "GrowBit",
   "short_name": "Growbit",
-  "start_url": "/"
+  "start_url": "/",
+  "id": "/"
 }
