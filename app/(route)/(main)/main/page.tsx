@@ -114,14 +114,21 @@ export default function Main() {
     }
   }
 
-  // 제일 낮은 달성률 계산
+  // 진행 중인 루틴에 대해서만 달성률 계산
   const calculateAchievementRates = () => {
-    return habits.map((habit) => {
-      const { achievementRate } = calculateAchievementData(habit)
-      return { ...habit, achievementRate }
-    })
+    return habits
+      .filter((habit) => {
+        const isExpired = new Date(habit.endDate) < new Date()
+        const { achievementRate } = calculateAchievementData(habit)
+        return achievementRate < 100 && !isExpired // 완료되지 않은 루틴만 필터링
+      })
+      .map((habit) => {
+        const { achievementRate } = calculateAchievementData(habit)
+        return { ...habit, achievementRate }
+      })
   }
 
+  // 진행 중인 루틴에서 최저 달성률을 가진 습관 계산
   const habitWithRates = calculateAchievementRates()
   const lowestHabit =
     habitWithRates.length > 0
