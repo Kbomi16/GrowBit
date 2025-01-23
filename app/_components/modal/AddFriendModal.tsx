@@ -8,22 +8,30 @@ import {
   getDocs,
   doc,
   updateDoc,
+  getDoc,
 } from 'firebase/firestore'
 
 type AddFriendModalProps = {
   onClose: () => void
   setUserData: Dispatch<SetStateAction<UserData>>
   userData: UserData
+  onAddFriend: (newFriend: {
+    id: string
+    nickname: string
+    bio: string
+  }) => void
 }
 
 export default function AddFriendModal({
   onClose,
   setUserData,
   userData,
+  onAddFriend,
 }: AddFriendModalProps) {
   const [friendNickname, setFriendNickname] = useState('')
   const [friendError, setFriendError] = useState('')
 
+  // 친구 추가 후 사용자 데이터 갱신
   const handleAddFriend = async () => {
     if (!friendNickname.trim()) {
       setFriendError('닉네임을 입력하세요.')
@@ -53,17 +61,50 @@ export default function AddFriendModal({
         return
       }
 
+      // 친구 목록에 바로 추가
       const updatedFriends = [...(userData.friends || []), friendId]
       const userDocRef = doc(db, 'users', auth.currentUser?.uid || '')
       await updateDoc(userDocRef, { friends: updatedFriends })
 
-      setUserData((prev) => ({
-        ...prev,
-        friends: updatedFriends,
+      // 상대방의 친구 목록에도 추가
+      const friendDocRef = doc(db, 'users', friendId)
+      const friendDocSnapshot = await getDoc(friendDocRef)
+
+      if (!friendDocSnapshot.exists()) {
+        setFriendError('친구 정보가 없습니다.')
+        return
+      }
+
+      const friendData = friendDocSnapshot.data()
+
+      if (!friendData) {
+        setFriendError('친구 정보를 불러오는 데 실패했습니다.')
+        return
+      }
+
+      const updatedFriendList = [
+        ...(friendData.friends || []),
+        auth.currentUser?.uid || '',
+      ]
+      await updateDoc(friendDocRef, { friends: updatedFriendList })
+
+      // 새로운 친구의 상세 정보
+      const newFriendDetails = {
+        id: friendId,
+        nickname: friendData.nickname,
+        bio: friendData.bio,
+      }
+
+      // 부모 컴포넌트에 친구 추가
+      onAddFriend(newFriendDetails)
+
+      // 사용자 데이터를 갱신 (state에 바로 반영)
+      setUserData((prevData) => ({
+        ...prevData,
+        friends: updatedFriends, // 친구 목록 갱신
       }))
-      alert(
-        `🎉 친구 추가에 성공했습니다! "${friendNickname}"님과 친구가 되었어요!`,
-      )
+
+      alert(`🎉 "${friendNickname}"님과 친구가 되었습니다!`)
       setFriendNickname('')
       setFriendError('')
       onClose()
@@ -82,7 +123,7 @@ export default function AddFriendModal({
         className="mx-auto w-full max-w-xs rounded-lg bg-white p-4 shadow-md md:max-w-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="mb-6 text-2xl font-semibold">👤친구 추가하기</h2>
+        <h2 className="mb-6 text-2xl font-semibold">👤 친구 추가하기</h2>
 
         <div className="mb-4">
           <label htmlFor="friendNickname" className="mb-2 block text-sm">
