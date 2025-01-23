@@ -3,6 +3,7 @@ import './globals.css'
 import Header from './_components/Header'
 import Footer from './_components/Footer'
 import { usePathname } from 'next/navigation'
+import Head from 'next/head'
 
 export default function RootLayout({
   children,
@@ -16,6 +17,9 @@ export default function RootLayout({
 
   return (
     <html lang="ko">
+      <Head>
+        <link rel="manifest" href="/manifest.json" />
+      </Head>
       <body>
         {!hideHeader && <Header />} {children}
         <Footer />
