@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import UserTabBar from '@/app/_components/TabBar/UserTabBar'
 import Profile from '@/app/_components/Profile/Profile'
 import { UserData } from '@/types/userData'
+import Friends from '@/app/_components/Friends/Friends'
 
 export default function MyPage() {
   const [user, setUser] = useState<User | null>(null)
@@ -53,23 +54,7 @@ export default function MyPage() {
         {activeTab === 'profile' ? (
           <Profile userData={userData} setUserData={setUserData} user={user} />
         ) : (
-          <div>
-            <h2 className="text-lg font-semibold">친구 목록</h2>
-            {userData.friends && userData.friends.length > 0 ? (
-              <ul className="mt-4 space-y-2">
-                {userData.friends.map((friend, index) => (
-                  <li
-                    key={index}
-                    className="rounded-md border p-2 text-gray-700"
-                  >
-                    {friend}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="mt-4 text-gray-500">친구 목록이 비어 있습니다.</p>
-            )}
-          </div>
+          <Friends userData={userData} setUserData={setUserData} />
         )}
       </div>
     </div>

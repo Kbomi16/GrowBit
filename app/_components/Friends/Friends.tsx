@@ -82,8 +82,8 @@ export default function Friends({ userData, setUserData }: FriendsProps) {
         >
           친구 추가
         </button>
-        <FriendList friends={userData.friendsDetails || []} />
       </div>
+      <FriendList friends={userData.friendsDetails || []} />
       {showModal && (
         <AddFriendModal
           onClose={() => setShowModal(false)}
