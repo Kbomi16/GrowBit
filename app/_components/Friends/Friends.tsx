@@ -2,7 +2,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { FriendData, UserData } from '@/types/userData'
 import AddFriendModal from '../modal/AddFriendModal'
 import FriendList from './FriendsList'
-import { db } from '@/app/_utils/firebaseConfig'
+import { db } from '@/app/_libs/firebaseConfig'
 import { doc, getDoc } from 'firebase/firestore'
 
 type FriendsProps = {

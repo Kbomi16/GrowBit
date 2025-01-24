@@ -1,6 +1,6 @@
 import { UserData } from '@/types/userData'
 import { Dispatch, SetStateAction, useState } from 'react'
-import { db, auth } from '@/app/_utils/firebaseConfig'
+import { db, auth } from '@/app/_libs/firebaseConfig'
 import {
   collection,
   query,

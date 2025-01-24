@@ -2,7 +2,7 @@
 import { useState, ChangeEvent, FormEvent } from 'react'
 import { FiUser, FiEdit2, FiLogOut } from 'react-icons/fi'
 import Image from 'next/image'
-import { auth, db } from '@/app/_utils/firebaseConfig'
+import { auth, db } from '@/app/_libs/firebaseConfig'
 import { doc, updateDoc } from 'firebase/firestore'
 import { useRouter } from 'next/navigation'
 import { UserData } from '@/types/userData'

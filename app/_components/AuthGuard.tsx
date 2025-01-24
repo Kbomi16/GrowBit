@@ -1,5 +1,5 @@
 'use client'
-import { auth } from '@/app/_utils/firebaseConfig'
+import { auth } from '@/app/_libs/firebaseConfig'
 import { getCookie } from 'cookies-next'
 import { onAuthStateChanged } from 'firebase/auth'
 import { useRouter } from 'next/navigation'
