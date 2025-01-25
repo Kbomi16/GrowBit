@@ -26,10 +26,13 @@ const app = initializeApp(firebaseConfig)
 export const auth = getAuth(app)
 export const db = getFirestore(app)
 
-export const messaging = getMessaging(app)
+export const messaging =
+  typeof window !== 'undefined' ? getMessaging(app) : null
 
 // 클라이언트에서 푸시 토큰 가져오기
 export const requestForToken = async () => {
+  if (!messaging) return // 서버 환경에서는 실행하지 않음
+
   try {
     const token = await getToken(messaging, {
       vapidKey: process.env.NEXT_PUBLIC_VAPID_KEY,
@@ -48,7 +51,13 @@ export const requestForToken = async () => {
 
 // 메시지 수신 대기
 export const onMessageListener = (): Promise<MessagePayload> =>
-  new Promise((resolve) => {
+  new Promise((resolve, reject) => {
+    if (!messaging) {
+      console.warn('Messaging is not initialized on the server.')
+      reject(new Error('Messaging is not initialized on the server.'))
+      return
+    }
+
     onMessage(messaging, (payload: MessagePayload) => {
       resolve(payload)
     })
