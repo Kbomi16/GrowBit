@@ -20,7 +20,7 @@ export default function MainLayout({ children }: { children: ReactNode }) {
       if (permission === 'granted' && messaging !== null) {
         try {
           const token = await getToken(messaging, {
-            vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
+            vapidKey: process.env.NEXT_PUBLIC_VAPID_KEY,
           })
           if (token) {
             console.log('Firebase 토큰:', token)
@@ -66,7 +66,7 @@ export default function MainLayout({ children }: { children: ReactNode }) {
       if (messaging !== null) {
         try {
           const token = await getToken(messaging, {
-            vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
+            vapidKey: process.env.NEXT_PUBLIC_VAPID_KEY,
           })
           if (token) {
             console.log('Firebase 토큰:', token)
