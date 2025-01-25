@@ -23,7 +23,6 @@ export default function MainLayout({ children }: { children: ReactNode }) {
             vapidKey: process.env.NEXT_PUBLIC_VAPID_KEY,
           })
           if (token) {
-            console.log('Firebase 토큰:', token)
             setFcmToken(token)
           } else {
             console.error('등록된 Firebase 토큰이 없습니다.')
@@ -36,24 +35,20 @@ export default function MainLayout({ children }: { children: ReactNode }) {
       }
     }
 
-    if (messaging !== null) {
-      requestPermissionAndGetToken()
-    }
+    requestPermissionAndGetToken()
 
     // 메시지 수신 처리
-    if (messaging !== null) {
-      onMessage(messaging, (payload) => {
-        console.log('메시지 수신:', payload)
-        const title = payload.notification?.title || '알림'
-        const body = payload.notification?.body || '내용이 없습니다.'
+    onMessage(messaging, (payload) => {
+      console.log('메시지 수신:', payload)
+      const title = payload.notification?.title || '알림'
+      const body = payload.notification?.body || '내용이 없습니다.'
 
-        new Notification(title, {
-          body,
-          icon: '/logo/logo192.png',
-        })
+      new Notification(title, {
+        body,
+        icon: '/icons/icons_maskable.png',
       })
-    }
-  }, []) // MainLayout이 마운트될 때 한번만 실행
+    })
+  }, [])
 
   // 알림 권한이 거부된 경우 다시 요청하는 함수
   const requestPermissionAgain = async () => {

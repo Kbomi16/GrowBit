@@ -41,11 +41,11 @@ export const requestForToken = async () => {
       console.log('FCM Token:', token)
     } else {
       console.warn(
-        'No registration token available. Request permission to generate one.',
+        '등록된 Firebase 토큰이 없습니다. 권한을 요청해 토큰을 생성하세요.',
       )
     }
   } catch (error) {
-    console.error('An error occurred while retrieving token. ', error)
+    console.error('토큰을 가져오는 중 오류가 발생했습니다. ', error)
   }
 }
 
@@ -53,8 +53,8 @@ export const requestForToken = async () => {
 export const onMessageListener = (): Promise<MessagePayload> =>
   new Promise((resolve, reject) => {
     if (!messaging) {
-      console.warn('Messaging is not initialized on the server.')
-      reject(new Error('Messaging is not initialized on the server.'))
+      console.warn('서버에서 메시징이 초기화되지 않았습니다.')
+      reject(new Error('서버에서 메시징이 초기화되지 않았습니다.'))
       return
     }
 
