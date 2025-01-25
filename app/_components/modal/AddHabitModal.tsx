@@ -1,4 +1,4 @@
-import { auth, db } from '@/app/_utils/firebaseConfig'
+import { auth, db } from '@/app/_libs/firebaseConfig'
 import { addDoc, collection } from 'firebase/firestore'
 import { ChangeEvent, useEffect, useState } from 'react'
 import DatePicker from 'react-datepicker'

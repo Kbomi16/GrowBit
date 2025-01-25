@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
-import { auth, db } from '@/app/_utils/firebaseConfig'
+import { auth, db } from '@/app/_libs/firebaseConfig'
 import { signupSchema } from '@/app/_utils/signupSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { FirebaseError } from 'firebase/app'

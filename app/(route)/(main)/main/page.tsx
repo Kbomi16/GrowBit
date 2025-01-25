@@ -1,6 +1,6 @@
 'use client'
 import AddHabitModal from '@/app/_components/modal/AddHabitModal'
-import { auth, db } from '@/app/_utils/firebaseConfig'
+import { auth, db } from '@/app/_libs/firebaseConfig'
 import {
   collection,
   getDocs,
