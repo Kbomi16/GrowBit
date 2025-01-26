@@ -17,18 +17,15 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig)
 const messaging = firebase.messaging()
 
-// 백그라운드에서만 메시지 처리
-messaging.onBackgroundMessage((payload) => {
-  console.log('백그라운드 메시지 수신:', payload)
+// 포그라운드에서 메시지 수신
+messaging.onMessage((payload) => {
+  console.log('포그라운드 메시지 수신:', payload)
 
   const title = payload.notification?.title || '알림'
   const body = payload.notification?.body || '새로운 알림이 도착했습니다.'
 
-  const options = {
+  new Notification(title, {
     body: body,
     icon: '/icons/icon_maskable.png',
-    tag: `notification-${Date.now()}`,
-  }
-
-  self.registration.showNotification(title, options)
+  })
 })
