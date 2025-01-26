@@ -50,16 +50,17 @@ export default function RootLayout({
 
     requestPermissionAndGetToken()
 
-    onMessage(messaging, (payload) => {
-      console.log('메시지 수신:', payload)
-      const title = payload.notification?.title || '알림'
-      const body = payload.notification?.body || '내용이 없습니다.'
+    // onMessage(messaging, (payload) => {
+    //   console.log('포그라운드 메시지 수신:', payload)
+    //   const title = payload.notification?.title || '알림'
+    //   const body = payload.notification?.body || '내용이 없습니다.'
 
-      new Notification(title, {
-        body,
-        icon: '/icons/icon_maskable.png',
-      })
-    })
+    //   new Notification(title, {
+    //     body,
+    //     icon: '/icons/icon_maskable.png',
+    //     tag: 'unique-notification-tag', // 중복 알림 방지 태그
+    //   })
+    // })
   }, [])
 
   const requestPermissionAgain = async () => {

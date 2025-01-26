@@ -1,12 +1,7 @@
 import { initializeApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
-import {
-  getMessaging,
-  getToken,
-  onMessage,
-  MessagePayload,
-} from 'firebase/messaging'
+import { getMessaging, getToken } from 'firebase/messaging'
 
 // Firebase 설정
 export const firebaseConfig = {
@@ -50,15 +45,15 @@ export const requestForToken = async () => {
 }
 
 // 메시지 수신 대기
-export const onMessageListener = (): Promise<MessagePayload> =>
-  new Promise((resolve, reject) => {
-    if (!messaging) {
-      console.warn('서버에서 메시징이 초기화되지 않았습니다.')
-      reject(new Error('서버에서 메시징이 초기화되지 않았습니다.'))
-      return
-    }
+// export const onMessageListener = (): Promise<MessagePayload> =>
+//   new Promise((resolve, reject) => {
+//     if (!messaging) {
+//       console.warn('서버에서 메시징이 초기화되지 않았습니다.')
+//       reject(new Error('서버에서 메시징이 초기화되지 않았습니다.'))
+//       return
+//     }
 
-    onMessage(messaging, (payload: MessagePayload) => {
-      resolve(payload)
-    })
-  })
+//     onMessage(messaging, (payload: MessagePayload) => {
+//       resolve(payload)
+//     })
+//   })

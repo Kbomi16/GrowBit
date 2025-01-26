@@ -17,14 +17,18 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig)
 const messaging = firebase.messaging()
 
+// 백그라운드에서 메시지 수신
 messaging.onBackgroundMessage((payload) => {
   console.log('백그라운드 메시지 수신:', payload)
+
   const title = payload.notification?.title || '알림'
   const body = payload.notification?.body || '새로운 알림이 도착했습니다.'
+
+  // 'tag'를 사용해 중복 알림 방지
   const options = {
     body: body,
     icon: '/icons/icon_maskable.png',
-    tag: payload.messageId, // messageId를 tag로 사용하여 중복을 방지
+    tag: 'unique-notification-tag', // 같은 태그로 중복 알림 방지
   }
 
   self.registration.showNotification(title, options)
