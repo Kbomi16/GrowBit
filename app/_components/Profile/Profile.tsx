@@ -2,11 +2,12 @@
 import { useState, ChangeEvent, FormEvent } from 'react'
 import { FiUser, FiEdit2, FiLogOut } from 'react-icons/fi'
 import Image from 'next/image'
-import { auth, db } from '@/app/_libs/firebaseConfig'
+import { auth, db, storage } from '@/app/_libs/firebaseConfig'
 import { doc, updateDoc } from 'firebase/firestore'
 import { useRouter } from 'next/navigation'
 import { UserData } from '@/types/userData'
 import { User } from 'firebase/auth'
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 
 type ProfileProps = {
   userData: UserData
@@ -17,16 +18,36 @@ type ProfileProps = {
 export default function Profile({ userData, setUserData }: ProfileProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [tempUserData, setTempUserData] = useState<UserData>(userData)
+  const [imageFile, setImageFile] = useState<File | null>(null) // 이미지 파일 상태 추가
+  const [imagePreview, setImagePreview] = useState<string | null>(null) // 미리보기 상태 추가
+
   const router = useRouter()
 
   const handleUpdate = async (e: FormEvent) => {
     e.preventDefault()
     if (!auth.currentUser?.uid) return
 
+    let profileImageUrl = userData.profileImage
+
+    // 이미지 파일이 존재하면 업로드 진행
+    if (imageFile) {
+      // Firebase Storage에 업로드할 파일 참조를 생성
+      const imageRef = ref(storage, `profile_images/${auth.currentUser.uid}`)
+      await uploadBytes(imageRef, imageFile) // 이미지 업로드
+
+      // 업로드 후 다운로드 URL 얻기
+      profileImageUrl = await getDownloadURL(imageRef)
+    }
+
     const userDocRef = doc(db, 'users', auth.currentUser.uid)
-    await updateDoc(userDocRef, tempUserData)
-    setUserData(tempUserData)
+    await updateDoc(userDocRef, {
+      ...tempUserData,
+      profileImage: profileImageUrl,
+    })
+    setUserData({ ...tempUserData, profileImage: profileImageUrl })
     setIsEditing(false)
+
+    alert('프로필이 업데이트되었습니다!')
   }
 
   const handleChange = (
@@ -39,9 +60,22 @@ export default function Profile({ userData, setUserData }: ProfileProps) {
     }))
   }
 
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setImageFile(file) // 이미지 파일 상태 업데이트
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string) // 미리보기 업데이트
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
   const handleCancel = () => {
     setTempUserData(userData)
     setIsEditing(false)
+    setImagePreview(null) // 이미지 미리보기 취소
   }
 
   const handleLogout = async () => {
@@ -49,18 +83,49 @@ export default function Profile({ userData, setUserData }: ProfileProps) {
     router.push('/login')
   }
 
+  const handleImageReset = () => {
+    setImageFile(null) // 이미지 파일 초기화
+    setImagePreview(null) // 미리보기 초기화
+  }
+
   return (
     <div className="flex flex-col lg:flex-row">
-      <div className="mb-6 flex items-center justify-center lg:mb-0 lg:w-1/3">
-        {userData.profileImage ? (
-          <Image
-            src={userData.profileImage}
-            alt="Profile Image"
-            className="mr-4 h-24 w-24 rounded-full border-2 border-gray-300 object-cover md:h-48 md:w-48"
-          />
-        ) : (
-          <div className="mr-4 flex h-24 w-24 items-center justify-center rounded-full border-2 border-gray-300 bg-gray-200 md:h-48 md:w-48">
-            <FiUser className="h-12 w-12 text-gray-500 md:h-24 md:w-24" />
+      <div className="relative mb-6 flex items-center justify-center lg:mb-0 lg:w-1/3">
+        <div className="relative h-48 w-48 overflow-hidden rounded-full border-2 border-gray-300 bg-gray-200">
+          {imagePreview || userData.profileImage ? (
+            <Image
+              src={imagePreview || userData.profileImage}
+              alt="Profile Image"
+              className="h-full w-full object-cover"
+              width={192}
+              height={192}
+            />
+          ) : (
+            <FiUser className="flex h-full w-full items-center justify-center text-gray-500" />
+          )}
+        </div>
+        {isEditing && (
+          <div className="absolute bottom-0 right-0 flex flex-col items-center justify-center rounded-xl border-2 bg-white p-3">
+            <label
+              htmlFor="profile-image"
+              className="cursor-pointer rounded-lg py-1 text-sm text-black"
+            >
+              <FiEdit2 className="mr-1 inline" /> 프로필 변경
+            </label>
+            <hr className="my-2 w-full border-gray-300" />
+            <button
+              onClick={handleImageReset}
+              className="rounded-lg pt-1 text-sm text-black"
+            >
+              기본 이미지로 변경
+            </button>
+
+            <input
+              type="file"
+              id="profile-image"
+              onChange={handleImageChange}
+              className="hidden"
+            />
           </div>
         )}
       </div>
@@ -82,7 +147,7 @@ export default function Profile({ userData, setUserData }: ProfileProps) {
               name="bio"
               value={tempUserData.bio || ''}
               onChange={handleChange}
-              className="mt-2 w-full rounded-lg border-2 border-gray-300 p-2 focus:border-green-30 focus:outline-none"
+              className="mt-2 w-full rounded-lg border-2 border-gray-300 p-2 focus:border-green-500 focus:outline-none"
               placeholder="자기소개를 입력하세요"
             />
           ) : (
@@ -91,19 +156,20 @@ export default function Profile({ userData, setUserData }: ProfileProps) {
             </p>
           )}
         </div>
+
         <div className="flex flex-col gap-2">
           <div className="flex gap-2">
             {isEditing ? (
               <>
                 <button
                   onClick={handleUpdate}
-                  className="rounded-full bg-green-30 px-4 py-2 text-white transition hover:bg-green-40"
+                  className="rounded-full bg-green-40 px-4 py-2 text-white transition hover:bg-green-50"
                 >
                   저장
                 </button>
                 <button
                   onClick={handleCancel}
-                  className="rounded-full border-2 border-green-30 bg-white px-4 py-2 text-black transition hover:bg-green-30 hover:text-white"
+                  className="rounded-full border-2 border-green-40 bg-white px-4 py-2 text-black transition hover:bg-green-40 hover:text-white"
                 >
                   취소
                 </button>
@@ -111,7 +177,7 @@ export default function Profile({ userData, setUserData }: ProfileProps) {
             ) : (
               <button
                 onClick={() => setIsEditing(true)}
-                className="rounded-full bg-green-30 px-4 py-2 text-white transition hover:bg-green-40"
+                className="rounded-full bg-green-40 px-4 py-2 text-white transition hover:bg-green-50"
               >
                 <FiEdit2 className="inline" /> 프로필 편집
               </button>

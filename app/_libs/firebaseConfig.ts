@@ -2,6 +2,7 @@ import { initializeApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
 import { getMessaging, getToken } from 'firebase/messaging'
+import { getStorage } from 'firebase/storage'
 
 // Firebase 설정
 export const firebaseConfig = {
@@ -20,6 +21,7 @@ const app = initializeApp(firebaseConfig)
 // Firebase 서비스 객체 생성
 export const auth = getAuth(app)
 export const db = getFirestore(app)
+export const storage = getStorage(app)
 
 export const messaging =
   typeof window !== 'undefined' ? getMessaging(app) : null
