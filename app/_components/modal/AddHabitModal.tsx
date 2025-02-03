@@ -1,10 +1,12 @@
 import { auth, db } from '@/app/_libs/firebaseConfig'
-import { addDoc, collection } from 'firebase/firestore'
+import { addDoc, collection, doc, getDoc } from 'firebase/firestore'
 import { ChangeEvent, useEffect, useState } from 'react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import '@/public/styles/reactDatePicker.css'
-import { User } from 'firebase/auth'
+import { FriendData, UserData } from '@/types/userData'
+import DayCheckbox from '../dayCheckbox/DayCheckbox'
+import { FiCheck, FiUser } from 'react-icons/fi'
 
 type HabitModalProps = {
   onClose: () => void
@@ -18,6 +20,8 @@ type Habit = {
   frequency: string[]
   completedDates: string[]
   userId: string
+  friends: string[]
+  progress: Record<string, number>
 }
 
 export default function AddHabitModal({
@@ -28,42 +32,76 @@ export default function AddHabitModal({
   const [startDate, setStartDate] = useState<Date | null>(null)
   const [endDate, setEndDate] = useState<Date | null>(null)
   const [frequency, setFrequency] = useState<string[]>([])
-  const [currentUser, setCurrentUser] = useState<User | null>(null)
-
+  const [currentUser, setCurrentUser] = useState<UserData | null>(null)
+  const [friends, setFriends] = useState<FriendData[]>([])
+  const [selectedFriends, setSelectedFriends] = useState<string[]>([])
   const today = new Date()
 
   useEffect(() => {
-    setCurrentUser(auth.currentUser)
+    const getCurrentUser = async () => {
+      const user = auth.currentUser
+      if (user) {
+        const userData = await fetchUserData(user.uid)
+        setCurrentUser(userData)
+        if (userData) {
+          fetchFriends(userData)
+        }
+      }
+    }
+    getCurrentUser()
   }, [])
 
-  // 요일 선택
+  const fetchUserData = async (userId: string) => {
+    const userDocRef = doc(db, 'users', userId)
+    const userDoc = await getDoc(userDocRef)
+    return userDoc.exists() ? (userDoc.data() as UserData) : null
+  }
+
+  const fetchFriends = async (userData: UserData) => {
+    const friendsIds = userData.friends || []
+    const friendsDetails: FriendData[] = []
+
+    for (const friendId of friendsIds) {
+      const friendDocRef = doc(db, 'users', friendId)
+      const friendDoc = await getDoc(friendDocRef)
+
+      if (friendDoc.exists()) {
+        friendsDetails.push({
+          id: friendId,
+          nickname: friendDoc.data()?.nickname || '',
+          bio: friendDoc.data()?.bio || '',
+        })
+      }
+    }
+    setFriends(friendsDetails)
+  }
+
   const handleFrequencyChange = (e: ChangeEvent<HTMLInputElement>) => {
     const day = e.target.value
-    if (e.target.checked) {
-      setFrequency((prev) => [...prev, day])
-    } else {
-      setFrequency((prev) => prev.filter((item) => item !== day))
-    }
+    setFrequency((prev) =>
+      e.target.checked ? [...prev, day] : prev.filter((item) => item !== day),
+    )
+  }
+
+  const handleFriendChange = (
+    e: ChangeEvent<HTMLInputElement>,
+    friendId: string,
+  ) => {
+    setSelectedFriends((prev) =>
+      e.target.checked
+        ? [...prev, friendId]
+        : prev.filter((id) => id !== friendId),
+    )
   }
 
   const handleSubmit = async () => {
-    if (!startDate || !endDate) {
-      alert('시작일과 종료일을 선택해주세요.')
-      return
-    }
-
-    const start = new Date(startDate)
-    const end = new Date(endDate)
-    const oneWeekInMillis = 7 * 24 * 60 * 60 * 1000 // 1주일의 밀리초
-
-    if (end.getTime() - start.getTime() < oneWeekInMillis) {
-      alert('루틴은 최소 1주일 이상 등록해야 합니다.')
-      return
-    }
-    if (!currentUser) {
-      alert('로그인이 필요합니다.')
-      return
-    }
+    if (!habitName.trim()) return alert('루틴 이름을 입력해주세요.')
+    if (!startDate || !endDate) return alert('시작일과 종료일을 선택해주세요.')
+    if (frequency.length === 0)
+      return alert('요일을 최소 1개 이상 선택해주세요.')
+    if (endDate.getTime() - startDate.getTime() < 7 * 24 * 60 * 60 * 1000)
+      return alert('루틴은 최소 1주일 이상이어야 합니다.')
+    if (!currentUser) return alert('로그인이 필요합니다.')
 
     const newHabit: Habit = {
       name: habitName,
@@ -71,7 +109,15 @@ export default function AddHabitModal({
       endDate: endDate?.toISOString().split('T')[0] || '',
       frequency,
       completedDates: [],
-      userId: currentUser.uid,
+      userId: currentUser.id,
+      friends: selectedFriends,
+      progress: selectedFriends.reduce(
+        (acc, friendId) => {
+          acc[friendId] = 0
+          return acc
+        },
+        {} as Record<string, number>,
+      ),
     }
 
     try {
@@ -112,7 +158,7 @@ export default function AddHabitModal({
           <DatePicker
             selected={startDate}
             onChange={(date) => setStartDate(date)}
-            minDate={today} // 오늘 날짜 이후로 설정
+            minDate={today}
             className="w-full cursor-pointer rounded-full border-2 border-gray-300 px-4 py-2 outline-none focus:border-green-40"
             dateFormat="yyyy-MM-dd"
             placeholderText="날짜를 선택해주세요"
@@ -124,7 +170,7 @@ export default function AddHabitModal({
           <DatePicker
             selected={endDate}
             onChange={(date) => setEndDate(date)}
-            minDate={startDate || today} // 시작 날짜 이후로 설정
+            minDate={startDate || today}
             className="w-full cursor-pointer rounded-full border-2 border-gray-300 px-4 py-2 outline-none focus:border-green-40"
             dateFormat="yyyy-MM-dd"
             placeholderText="날짜를 선택해주세요"
@@ -135,38 +181,59 @@ export default function AddHabitModal({
           <label className="mb-2 block text-sm">매주 수행할 요일</label>
           <div className="flex flex-wrap gap-4">
             {['월', '화', '수', '목', '금', '토', '일'].map((day) => (
-              <label key={day} className="flex cursor-pointer items-center">
+              <DayCheckbox
+                key={day}
+                day={day}
+                isSelected={frequency.includes(day)}
+                onChange={handleFrequencyChange}
+              />
+            ))}
+          </div>
+        </div>
+
+        <div className="mb-4">
+          <label className="mb-2 block text-sm">친구와 함께하기</label>
+          <div className="flex flex-wrap gap-4">
+            {friends.map((friend) => (
+              <label
+                key={friend.id}
+                className="flex cursor-pointer items-center gap-2"
+              >
                 <input
                   type="checkbox"
-                  value={day}
-                  checked={frequency.includes(day)}
-                  onChange={handleFrequencyChange}
+                  checked={selectedFriends.includes(friend.id)}
+                  onChange={(e) => handleFriendChange(e, friend.id)}
                   className="hidden"
                 />
-                <div
-                  className={`flex h-6 w-6 items-center justify-center rounded-full border-2 md:h-10 md:w-10 ${
-                    frequency.includes(day)
-                      ? 'border-green-20 bg-green-20'
-                      : 'border-gray-300'
-                  }`}
-                >
-                  <span
-                    className={`text-sm md:text-lg ${frequency.includes(day) ? 'text-white' : 'text-black'}`}
-                  >
-                    {day}
-                  </span>
+                <div className="flex flex-col items-center gap-3 rounded-full transition">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-gray-300 bg-gray-200">
+                    {selectedFriends.includes(friend.id) ? (
+                      <FiCheck className="h-8 w-8 text-gray-500" />
+                    ) : (
+                      <FiUser className="h-8 w-8 text-gray-500" />
+                    )}
+                  </div>
+                  <span className="text-sm">{friend.nickname}</span>
                 </div>
               </label>
             ))}
           </div>
         </div>
 
-        <button
-          className="w-full rounded-full bg-green-30 px-6 py-3 text-white shadow-lg transition hover:bg-green-40"
-          onClick={handleSubmit}
-        >
-          루틴 추가
-        </button>
+        <div className="flex justify-end gap-4">
+          <button
+            className="rounded-full border-2 border-green-40 px-4 py-2 text-black transition-all hover:bg-green-40 hover:text-white"
+            onClick={onClose}
+          >
+            취소
+          </button>
+          <button
+            className="rounded-full bg-green-40 px-4 py-2 text-white transition-all hover:bg-green-50"
+            onClick={handleSubmit}
+          >
+            등록
+          </button>
+        </div>
       </div>
     </div>
   )
