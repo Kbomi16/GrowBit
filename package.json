@@ -14,9 +14,11 @@
     "chart.js": "^4.4.6",
     "cookies-next": "^5.0.2",
     "dayjs": "^1.11.13",
-    "firebase": "^11.0.2",
+    "firebase": "^11.1.0",
+    "firebase-admin": "^13.0.2",
     "framer-motion": "^11.11.17",
     "next": "15.0.3",
+    "next-pwa": "^5.6.0",
     "react": "18.3.1",
     "react-calendar": "^5.1.0",
     "react-chartjs-2": "^5.2.0",
@@ -29,6 +31,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@types/next-pwa": "^5.6.9",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
@@ -38,6 +41,8 @@
     "prettier": "^3.4.0",
     "prettier-plugin-tailwindcss": "^0.6.9",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "webpack": "^5.97.1",
+    "webpack-cli": "^6.0.1"
   }
 }

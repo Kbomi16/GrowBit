@@ -1,5 +1,5 @@
 'use client'
-import { auth } from '@/app/_utils/firebaseConfig'
+import { auth } from '@/app/_libs/firebaseConfig'
 import { loginSchema } from '@/app/_utils/loginSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { FirebaseError } from 'firebase/app'
