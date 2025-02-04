@@ -9,6 +9,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { setCookie } from 'cookies-next'
+import { useState } from 'react'
+import Loading from '@/app/loading'
 
 type FormData = {
   email: string
@@ -24,10 +26,12 @@ export default function Login() {
     resolver: zodResolver(loginSchema),
     mode: 'all',
   })
+  const [loading, setLoading] = useState(false)
 
   const router = useRouter()
 
   const onSubmit = async (data: FormData) => {
+    setLoading(true)
     try {
       const userCredential = await signInWithEmailAndPassword(
         auth,
@@ -61,7 +65,13 @@ export default function Login() {
       } else {
         alert('알 수 없는 오류가 발생했습니다. 다시 시도해주세요.')
       }
+    } finally {
+      setLoading(false)
     }
+  }
+
+  if (loading) {
+    return <Loading />
   }
 
   return (
