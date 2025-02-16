@@ -52,6 +52,8 @@ export default function Main() {
       })
       .filter((habit) => habit.userId === currentUserId) // 유저 ID 필터링
     setHabits(habitList) // 해당 유저의 루틴만 설정
+
+    setCurrentPage(1)
   }
 
   useEffect(() => {

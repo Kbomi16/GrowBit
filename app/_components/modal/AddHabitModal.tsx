@@ -123,7 +123,14 @@ export default function AddHabitModal({
           <label className="mb-2 flex items-center text-sm">종료 날짜</label>
           <DatePicker
             selected={endDate}
-            onChange={(date) => setEndDate(date)}
+            onChange={(date) => {
+              if (date) {
+                // 날짜를 올바른 시간대로 조정
+                const adjustedDate = new Date(date)
+                adjustedDate.setHours(23, 59, 59, 999) // 시간을 23:59:59.999로 설정
+                setEndDate(adjustedDate)
+              }
+            }}
             minDate={startDate || today} // 시작 날짜 이후로 설정
             className="w-full cursor-pointer rounded-full border-2 border-gray-300 px-4 py-2 outline-none focus:border-green-40"
             dateFormat="yyyy-MM-dd"
