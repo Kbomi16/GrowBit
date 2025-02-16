@@ -10,6 +10,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
+import Loading from '@/app/loading'
+import { useState } from 'react'
 
 type FormData = {
   email: string
@@ -27,10 +29,13 @@ export default function Signup() {
     resolver: zodResolver(signupSchema),
     mode: 'all',
   })
+  const [loading, setLoading] = useState(false)
 
   const router = useRouter()
 
   const onSubmit = async (data: FormData) => {
+    setLoading(true)
+
     const { confirmPassword, ...submitData } = data
     try {
       const userInfo = await createUserWithEmailAndPassword(
@@ -60,7 +65,13 @@ export default function Signup() {
       } else {
         alert('알 수 없는 오류가 발생했습니다. 다시 시도해주세요.')
       }
+    } finally {
+      setLoading(false)
     }
+  }
+
+  if (loading) {
+    return <Loading />
   }
 
   return (

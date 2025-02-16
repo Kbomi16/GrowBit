@@ -15,7 +15,7 @@ export default function RootLayout({
 }>) {
   const pathname = usePathname()
 
-  const hideHeaderPages = ['/', '/login', '/signup']
+  const hideHeaderPages = ['/', '/login', '/signup', '/not-found']
   const hideHeader = hideHeaderPages.includes(pathname)
 
   const [notificationPermission, setNotificationPermission] =
